@@ -1,0 +1,19 @@
+body {
+  background: #1f2429;
+}
+
+header {
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: inline-block;
+  width: 100%;
+  height: 150px;
+  background-image: url("/images/headerBackground.png");
+}
+
+#logo {
+  width: 130px;
+  height: auto;
+  padding: 10px;
+}
