@@ -3,14 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+      integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" type="text/css" href="libs/css/styles.css" />
-    <title>Company Data</title>
+    <title>Global Unity</title>
   </head>
-  
-  <header><img id="logo" src="/images/companyLogo.png" alt="company logo"></header>
-  <body>
-    <script type="application/javascript" src="libs/js/jqueryv3.5.1.js"></script>
-    <script type="application/javascript" src="libs/js/script.js"></script>
-
-  </body>
+  <header>
+    <div id="logo-container">
+      <img id="logo" src="/images/companyLogo.png" alt="company logo" />
+    </div>
+  </header>
+  <nav class="left-sidebar">
+    <a><img class="icon" id="dashboard" src="/images/icons/dashboard.png" /></a>
+    <a><img class="icon" id="database" src="/images/icons/database.png" /></a>
+    <a><img class="icon" id="graph" src="/images/icons/graph.png" /></a>
+    <a><img class="icon" id="add" src="/images/icons/addemployee.png" /></a>
+  </nav>
+  <main>
+    <h2>Dashboard</h2>
+  </main>
+  <!-- JQuery Script -->
+  <script type="application/javascript" src="libs/js/jqueryv3.5.1.js"></script>
+  <!-- Bootstrap Script -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
+    crossorigin="anonymous"
+  ></script>
+  <script type="application/javascript" src="libs/js/script.js"></script>
 </html>
