@@ -1,8 +1,5 @@
 <?php
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/getAll.php
-
 	// remove next two lines for production
 	
 	ini_set('display_errors', 'On');
@@ -32,7 +29,36 @@
 
 	}	
 
-	$query = 'SELECT p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) ORDER BY p.lastName, p.firstName, d.name, l.name';
+	switch ($_POST['querytype']) {
+		case 'personnel':
+			if($_POST['search'] === 'all') {
+				
+					$query = 'SELECT p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+								FROM personnel p 
+								LEFT JOIN department d ON (d.id = p.departmentID) 
+								LEFT JOIN location l ON (l.id = d.locationID) 
+								ORDER BY p.lastName, p.firstName, d.name, l.name'; 
+				
+			} else {
+				$query = 'SELECT * FROM personnel p
+				WHERE p.id = ' . $_POST['search'];
+			}
+			break;
+
+			case 'department':
+				if($_POST['search'] === 'all') {
+					$query = 'SELECT id, name, locationID 
+					FROM department';
+				} else {
+					$query = 'SELECT * FROM personnel p
+					WHERE p.departmentID = ' . $_POST['search']; 
+				};
+			break;
+		
+		default:
+			echo ('querytype error');
+			break;
+	}
 
 	$result = $conn->query($query);
 	
