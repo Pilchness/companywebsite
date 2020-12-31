@@ -1,8 +1,8 @@
 class DatabaseQuery {
     constructor(table) {
-      this.type = type;
+      //this.type = type;
       this.table = table;
-      this.data = data;
+      //this.data = data;
     }
   
     getData = async () => {
@@ -25,8 +25,8 @@ class DatabaseQuery {
     };
   }
 
-  const personnel = new DatabaseQuery(personnel)
-  personnel().then(response => console.log(response));
+  const personnel = new DatabaseQuery('personnel');
+  personnel.getData().then(response => console.log(response));
 
   //type CREATE / REMOVE / UPDATE / DELETE
   //table DEPT / LOCATION / PERSONNEL
