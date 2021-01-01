@@ -55,3 +55,66 @@ departmentDirectoryQuery.getData(2).then((response) => {
 //delete department
 //get personnel
 //add new department
+
+const loadDashboard = () => {
+  console.log("loading dashboard");
+};
+
+const mainDirectory = async () => {
+  personnelDirectoryQuery.getData("all").then((response) => {
+    console.log(response);
+    response.forEach((person) => {
+      $("#main-directory").append(`<div class="card">
+      <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">${person.lastName} ${person.firstName}</h5>
+        <p class="card-text">SSome information about the person</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+    </div>`);
+    });
+  });
+};
+
+const loadPersonnelPage = () => {
+  $("#main-content-header").append(`<ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#directory">Directory</a></li>
+  <li><a data-toggle="tab" href="#departments">Departments</a></li>
+  <li><a data-toggle="tab" href="#chart">Chart</a></li>
+</ul>`);
+  $("#main-content").html(`  
+<div class="tab-content">
+  <div id="directory" class="tab-pane fade in active">
+    <div id="card-holder">
+    <ul id="main-directory"></ul>
+    </div>
+  </div>
+  <div id="departments" class="tab-pane fade">
+    <h3>Departments</h3>
+    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </div>
+  <div id="chart" class="tab-pane fade">
+    <h3>Chart</h3>
+    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+  </div>
+</div>
+</div>`);
+  mainDirectory();
+};
+
+const loadPage = (pageId) => {
+  switch (pageId) {
+    case "personnel":
+      loadPersonnelPage();
+    default:
+      loadDashboard();
+  }
+};
+
+$(document).ready(function () {
+  $(".icon").on("click", function () {
+    $("#page-title").text($(this).attr("value"));
+    loadPage($(this).attr("id"));
+  });
+});
