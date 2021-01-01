@@ -67,11 +67,11 @@ const mainDirectory = async () => {
         .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
         <div class="card-header">${person.firstName} ${person.lastName}</div>
         <div class="card-body text-dark">
-        <img src='/images/staffpics/staffphoto_id_${person.id}.jpg' width='80px' height='80px' style="background-color: black"/>
+        <img src='/images/staffpics/staffphoto_id_${person.id}.jpg' width='50px' height='50px'/>
           <ul style="margin-left: 5px; margin-top: 5px">
-          <li>Department: ${person.department}</li>
-          <li>Location: ${person.location}</li>
-          <li>Email: ${person.email}</li>
+          <li class="person-card-text"><b>Dept:</b> ${person.department}</li>
+          <li class="person-card-text"><b>Location:</b> ${person.location}</li>
+          <li class="person-card-text">${person.email}</li>
           </ul>
         </div>
       </div>`);
@@ -93,8 +93,8 @@ const departmentList = async () => {
       departmentDirectoryQuery.getData(department.id).then((response) => {
         response.forEach((departmentMember) => {
           $(`#personnel-dept-${department.id}`).append(
-            `<div><img src='/images/staffpics/staffphoto_id_${departmentMember.id}.jpg' width="50px" height="50px"/>
-            <a>${departmentMember.firstName} ${departmentMember.lastName}</a></div>`
+            `<div class="dept-photo"><img src='/images/staffpics/staffphoto_id_${departmentMember.id}.jpg' width="30px" height="30px"/>
+            <a class="person-card-text">${departmentMember.firstName} ${departmentMember.lastName}</a></div>`
           );
         });
       });
@@ -106,7 +106,7 @@ const loadPersonnelPage = () => {
   $("#main-content-header").append(`
       <div id="personnel-button-container" class="nav nav-tabs">
       <button id="directory" class="personnel-button"><h3>Directory</h3></button>
-      <button id="departments" class="personnel-button"><h3>Departments</h3></button>
+      <button id="departments" class="personnel-button"><h3>Teams</h3></button>
       <button id="chart" class="personnel-button"><h3>Chart</h3></button>
       </div>`);
   const loadPersonnelTab = (tab) => {

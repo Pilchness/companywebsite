@@ -7,14 +7,23 @@ body {
   background-color: #000333;
 }
 
+h3 {
+  font-size: 0.8em;
+}
+
 #main-body {
-  background: gray;
+  background: black;
   display: grid;
   grid-template-columns: minmax(70px, 10%) 1fr;
 }
 
+#main-content {
+  overflow: scroll;
+  background: black;
+}
+
 main {
-  background: blue;
+  background: black;
   z-index: 25;
 }
 #logo {
@@ -23,7 +32,9 @@ main {
   max-width: 1200px;
   height: auto;
   z-index: 300;
-  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 header {
@@ -46,14 +57,24 @@ header {
   min-width: 50px;
   max-width: 100px; */
   background: black;
-  height: 100vh;
-
-  padding: 22vh 5px 0px 5px;
+  height: 10000px;
   z-index: 100;
+}
+
+#sidebar-holder {
+  /* width: 10vw;
+    min-width: 50px;
+    max-width: 100px; */
+  background: black;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  padding: 25vh 5px 5px 5px;
+  margin-left: 10px;
+  position: fixed;
+  left: 0;
+  top: 0;
 }
 
 .icon {
@@ -72,15 +93,17 @@ header {
   right: 0px;
   left: 70px;
   width: calc(100vw - 70px);
-  background: green;
+  background: black;
   display: grid;
   place-items: center;
   color: white;
-  height: 10vh;
+  height: auto;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
   flex-direction: column;
+  z-index: 100;
+  padding-left: 5px;
 }
 
 #page-title {
@@ -91,10 +114,117 @@ header {
   margin: 10px;
 }
 
+#personnel-button-container {
+  width: 100%;
+}
+
+.personnel-button {
+  background-color: gray;
+  display: grid;
+  place-items: center;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  width: 30%;
+  color: white;
+  outline: none;
+  opacity: 50%;
+}
+
+.personnel-button:focus {
+  outline: none;
+  opacity: 100%;
+}
+.personnel-button::-moz-focus-inner {
+  border: 0;
+}
+
+a {
+  padding: 0;
+}
+
+a:hover {
+  opacity: 50%;
+}
+
+.card-body {
+  height: 10vh;
+  width: 100px;
+  padding: 2px 5px 2px 10px;
+  display: flex;
+  flex-direction: row;
+}
+.card {
+  width: 100%;
+  color: white;
+}
+
+.person-card-text {
+  font-size: 0.6em;
+}
+
+.dept-card-body {
+  height: auto;
+  width: 100%;
+  padding: 5px 5px 5px 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+.dept-list {
+  columns: 2;
+  -webkit-columns: 2;
+  -moz-columns: 2;
+  margin-left: 5px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.card-header {
+  color: black;
+  font-family: "Kadwa", serif;
+  font-weight: 700;
+  font-size: 3vw;
+  padding: 2px 2px 2px 10px;
+}
+
+.card-text {
+  color: black;
+  font-family: "Kadwa", serif;
+  font-weight: 400;
+  font-size: 2vw;
+}
+
+#main-directory,
+#department-list {
+  margin-left: 0;
+  margin-top: 170px;
+  padding: 2px;
+}
+
+.dept-photo {
+  padding: 1px;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  padding: 0;
+  margin: 0;
+  width: 55vw;
+}
+
 @media only screen and (min-width: 750px) {
   .icon {
     max-width: 50px;
     max-height: 50px;
+  }
+
+  #main-body {
+    grid-template-columns: minmax(90px, 10%) 1fr;
   }
 }
 
