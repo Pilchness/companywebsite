@@ -27,7 +27,7 @@ class DatabaseQuery {
 const personnelDirectoryQuery = new DatabaseQuery("personnel");
 const departmentDirectoryQuery = new DatabaseQuery("department");
 
-personnelDirectoryQuery.getData("all").then((response) => {
+personnelDirectoryQuery.getData("all_personnel").then((response) => {
   //console.log(response);
   //returns list of all personnel and all of their data
 });
@@ -60,8 +60,9 @@ const loadDashboard = () => {
   console.log("loading dashboard");
 };
 
-const mainDirectory = async () => {
-  personnelDirectoryQuery.getData("all").then((response) => {
+const mainDirectory = async (search) => {
+  $("#main-directory").empty();
+  personnelDirectoryQuery.getData(search).then((response) => {
     response.forEach((person) => {
       $("#main-directory")
         .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
@@ -108,13 +109,25 @@ const loadPersonnelPage = () => {
       <button id="directory" class="personnel-button"><h3>Directory</h3></button>
       <button id="departments" class="personnel-button"><h3>Teams</h3></button>
       <button id="chart" class="personnel-button"><h3>Chart</h3></button>
+      <img id="search-icon" src='/images/icons/search.png'alt='search database' width='20px' height='20px'/>
       </div>`);
+  $("#search-icon").on("click", function () {
+    $("#main-content-header").append(`
+        <div style="margin-top: 3px; width: 100%; padding-right: 3px"><form class="form-inline">
+        <input id="name-search" class="form-control mr-sm-1" type="search" placeholder="Search" aria-label="Search">
+      </form></div>`);
+    $("#main-directory").css("margin-top", "210px");
+    $("#name-search").on("keyup", function () {
+      console.log($(this).val());
+      mainDirectory($(this).val());
+    });
+  });
   const loadPersonnelTab = (tab) => {
     switch (tab) {
       case "directory":
         $("#directory").focus();
         $("#main-content").html(`<ul id="main-directory"></ul>`);
-        mainDirectory();
+        mainDirectory("all_personnel");
         break;
 
       case "departments":
