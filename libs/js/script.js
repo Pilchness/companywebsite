@@ -113,9 +113,23 @@ const loadPersonnelPage = () => {
       </div>`);
   $("#search-icon").on("click", function () {
     $("#main-content-header").append(`
-        <div style="margin-top: 3px; width: 100%; padding-right: 3px"><form class="form-inline">
+        <div style="margin-top: 3px; width: 100%; padding-right: 3px; display: flex">
+        <form style="flex: 2" class="form-inline">
         <input id="name-search" class="form-control mr-sm-1" type="search" placeholder="Search" aria-label="Search">
-      </form></div>`);
+        </form>
+        <div class="dropdown" style="flex: 1">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    All Departments
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#">Action</a>
+    <a class="dropdown-item" href="#">Another action</a>
+    <a class="dropdown-item" href="#">Something else here</a>
+  </div>
+</div>
+        
+        
+        </div>`);
     $("#main-directory").css("margin-top", "210px");
     $("#name-search").on("keyup", function () {
       console.log($(this).val());
