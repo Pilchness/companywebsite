@@ -12,6 +12,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Kadwa", serif;
+  background-color: #000333;
 }
 
 header {
@@ -93,25 +94,23 @@ a:hover {
 }
 
 .card-body {
-  border-width: 2px;
-  border-color: honeydew;
-  background-color: lavender;
   height: 10vh;
   width: 100%;
 }
 .card {
   width: 100%;
-  color: honeydew;
+  color: white;
 }
 
 #main-content {
   overflow: hidden;
   margin-top: 20px;
+  background-color: #000333;
 }
 
 #main-directory {
   padding: 5px;
-  margin-left: 15vw;
+  margin-left: 5px;
 }
 
 @media only screen and (max-width: 575px) {

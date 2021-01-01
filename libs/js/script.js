@@ -64,42 +64,20 @@ const mainDirectory = async () => {
   personnelDirectoryQuery.getData("all").then((response) => {
     console.log(response);
     response.forEach((person) => {
-      $("#main-directory").append(`<div class="card">
-      <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">${person.lastName} ${person.firstName}</h5>
-        <p class="card-text">SSome information about the person</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
-      </div>
-    </div>
-    </div>`);
+      $("#main-directory")
+        .append(`<div class="card border-dark mb-3" style="max-width: 100%;">
+        <div class="card-header">Header</div>
+        <div class="card-body text-dark">
+          <h5 class="card-title">Dark card title</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        </div>
+      </div>`);
     });
   });
 };
 
 const loadPersonnelPage = () => {
-  $("#main-content-header").append(`<ul class="nav nav-tabs">
-  <li class="active"><a data-toggle="tab" href="#directory">Directory</a></li>
-  <li><a data-toggle="tab" href="#departments">Departments</a></li>
-  <li><a data-toggle="tab" href="#chart">Chart</a></li>
-</ul>`);
-  $("#main-content").html(`  
-<div class="tab-content">
-  <div id="directory" class="tab-pane fade in active">
-    <div id="card-holder">
-    <ul id="main-directory"></ul>
-    </div>
-  </div>
-  <div id="departments" class="tab-pane fade">
-    <h3>Departments</h3>
-    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-  </div>
-  <div id="chart" class="tab-pane fade">
-    <h3>Chart</h3>
-    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
-  </div>
-</div>
-</div>`);
+  $("#main-content-header").append(`<ul id="main-directory"></ul>`);
   mainDirectory();
 };
 
