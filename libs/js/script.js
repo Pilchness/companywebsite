@@ -66,10 +66,14 @@ const mainDirectory = async () => {
     response.forEach((person) => {
       $("#main-directory")
         .append(`<div class="card border-dark mb-3" style="max-width: 100%;">
-        <div class="card-header">Header</div>
+        <div class="card-header">${person.firstName} ${person.lastName}</div>
         <div class="card-body text-dark">
-          <h5 class="card-title">Dark card title</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+<img src='/images/staffpics/staffphoto_id_${person.id}.jpg' width='80px' height='80px' style="background-color: black">
+          <ul style="margin-left: 5px; margin-top: 5px">
+          <li>Department: ${person.department}</li>
+          <li>Location: ${person.location}</li>
+          <li>Email: ${person.email}</li>
+          </ul>
         </div>
       </div>`);
     });
@@ -77,7 +81,14 @@ const mainDirectory = async () => {
 };
 
 const loadPersonnelPage = () => {
-  $("#main-content-header").append(`<ul id="main-directory"></ul>`);
+  $("#main-content-header").append(`
+  <div id="personnel-button-container" class="nav nav-tabs">
+  <button class="active personnel-button"><h3>Directory</h3></button>
+  <button class="personnel-button"><h3>Departments</h3></button>
+  <button class="personnel-button"><h3>Chart</h3></button>
+  </div>`);
+  $("#main-content").append(`<ul id="main-directory"></ul>`);
+
   mainDirectory();
 };
 
