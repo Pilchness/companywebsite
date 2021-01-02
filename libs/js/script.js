@@ -27,59 +27,32 @@ class DatabaseQuery {
 }
 
 let visibleSearch = false;
+let marginTop = ["162px", "195px"];
+const scrollReset = () => {
+  if ($("#main-content").length) {
+    document.getElementById("main-content").scrollIntoView();
+  }
+};
 const personnelDirectoryQuery = new DatabaseQuery("personnel");
 const departmentDirectoryQuery = new DatabaseQuery("department");
 const locationDirectoryQuery = new DatabaseQuery("location");
 const idQuery = new DatabaseQuery("id");
 
-personnelDirectoryQuery.getData("all_personnel").then((response) => {
-  //console.log(response);
-  //returns list of all personnel and all of their data
-});
-
-// personnelDirectoryQuery.getData(45).then((response) => {
-//   //console.log(response[0]);
-//   //returns data for staff memeber, passing staff ID
-// });
-
-departmentDirectoryQuery.getData("all").then((response) => {
-  //console.log(response);
-  //returns a list of departments with names and location IDs
-});
-
-// departmentDirectoryQuery.getData(2).then((response) => {
-//   //console.log(response);
-//   //returns a list of staff in department, passing dept ID
-// });
-
-locationDirectoryQuery.getData("all").then((response) => {
-  //console.log(response);
-  //returns a list of locations with names and location IDs
-});
-
-// locationDirectoryQuery.getData(2).then((response) => {
-//   //console.log(response);
-//   //returns a list of staff in department, passing dept ID
-// });
-
-//get all
-//search by name
-//list by department
-//list by location
-//onboard new staff member
-//delete department
-//get personnel
-//add new department
-
 const loadDashboard = () => {
   console.log("loading dashboard");
 };
 
+const loadReportsPage = () => {
+  console.log("loading reports");
+};
+
+const loadOnboardPage = () => {
+  console.log("loading onboard");
+};
+
 const mainDirectory = async (search, department) => {
-  console.log(search, department);
   $("#main-directory").empty();
   personnelDirectoryQuery.getData(search, department).then((response) => {
-    console.log(response);
     response.forEach((person) => {
       $("#main-directory")
         .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
@@ -94,7 +67,7 @@ const mainDirectory = async (search, department) => {
         </div>
       </div>`);
     });
-    document.getElementById("main-content").scrollIntoView();
+    scrollReset();
   });
 };
 
@@ -112,11 +85,13 @@ const departmentList = async () => {
       departmentDirectoryQuery.getData(department.id).then((response) => {
         response.forEach((departmentMember) => {
           $(`#personnel-dept-${department.id}`).append(
-            `<div class="dept-photo headshot" id="${departmentMember.id}"><img src='images/staffpics/staffphoto_id${departmentMember.id}.jpg' width="30px" height="30px"/>
+            `<div class="dept-photo headshot" id="${departmentMember.id}">
+            <img src='images/staffpics/staffphoto_id${departmentMember.id}.jpg' 
+            width="30px" height="30px"/>
             <span class="person-card-text">${departmentMember.firstName} ${departmentMember.lastName}</span></div>`
           );
         });
-        document.getElementById("main-content").scrollIntoView();
+        scrollReset();
       });
     });
   });
@@ -140,7 +115,7 @@ const locationList = async () => {
             <span class="person-card-text">${locationMember.firstName} ${locationMember.lastName} (${locationMember.department})</span></div>`
           );
         });
-        document.getElementById("main-content").scrollIntoView();
+        scrollReset();
       });
     });
   });
@@ -148,27 +123,31 @@ const locationList = async () => {
 
 const toggleSearchBar = async () => {
   if (!visibleSearch) {
-    $(".directory-content").css("margin-top", "210px");
+    $(".directory-content").css("margin-top", marginTop[1]);
     $("#main-content-header").append(`
-    <div
-  id="search-bar"
-  style="margin-top: 3px; width: 100%; padding-right: 3px; display: flex"
->
-  <form class="form-inline" style="display: flex;">
-    <input
-    style="flex 1"
-      id="name-search"
-      class="form-control mr-sm-1"
-      type="search"
-      spellcheck="false"
-      placeholder="Search"
-      aria-label="Search"
-    />
-    <select style="flex 1; border-radius: 5px" class="custom-select" id="department-selector">
-      <option id="0" selected>All Departments</option>
-    </select>
-  </form>
-</div>`);
+            <div
+          id="search-bar"
+          style="margin-top: 3px; width: 100%; padding-right: 3px; display: flex"
+        >
+          <form class="form-inline" style="display: flex">
+            <input
+              style="flex: 1"
+              id="name-search"
+              class="form-control mr-sm-1"
+              type="search"
+              spellcheck="false"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <select
+              style="flex: 1; border-radius: 5px"
+              class="custom-select"
+              id="department-selector"
+            >
+              <option id="0" selected>All Departments</option>
+            </select>
+          </form>
+        </div>`);
     departmentDirectoryQuery.getData("all").then((response) => {
       response.forEach((department) => {
         let departmentTextString = department.name;
@@ -183,23 +162,13 @@ const toggleSearchBar = async () => {
       });
     });
 
-    // $("#department-selector").on("change", function (e) {
-    //   let selectedDepartment = $("#department-selector option:selected").attr(
-    //     "id"
-    //   );
-    //   departmentDirectoryQuery.getData(selectedDepartment).then((response) => {
-    //     console.log(response);
-
-    //   });
-    // });
-
     const getNewData = () => {
       if ($("#person-file").length) {
         $("#person-file").remove();
         $("#main-content").html(
           `<ul id="main-directory" class="directory-content"></ul>`
         );
-        $(".directory-content").css("margin-top", "210px");
+        $(".directory-content").css("margin-top", marginTop[1]);
       }
       mainDirectory(
         $("#name-search").val(),
@@ -216,19 +185,21 @@ const toggleSearchBar = async () => {
     visibleSearch = true;
   } else {
     $("#search-bar").remove();
-    $(".directory-content").css("margin-top", "170px");
+    $(".directory-content").css("margin-top", marginTop[0]);
     visibleSearch = false;
   }
 };
 
 const loadPersonnelPage = () => {
-  $("#main-content-header").append(`
+  if (!$("#personnel-button-container").length) {
+    $("#main-content-header").append(`
       <div id="personnel-button-container" class="nav nav-tabs">
       <button id="directory" class="personnel-button"><h3>Directory</h3></button>
       <button id="departments" class="personnel-button"><h3>Teams</h3></button>
       <button id="locations" class="personnel-button"><h3>Locations</h3></button>
       <img id="search-icon" src='images/icons/search.png'alt='search database' width='20px' height='20px'/>
       </div>`);
+  }
   $("#search-icon").on("click", function () {
     toggleSearchBar();
   });
@@ -268,37 +239,67 @@ const loadPersonnelPage = () => {
 
   $(".personnel-button").on("click", function () {
     loadPersonnelTab($(this).attr("id"));
+    $(".directory-content").css("margin-top", marginTop[0]);
   });
+};
+
+const editPerson = (id) => {
+  console.log("editing " + id);
+};
+
+const offboardPerson = (id) => {
+  console.log("offboarding " + id);
 };
 
 const showPersonFile = async (id) => {
   idQuery.getData(id).then((response) => {
     let person = response[0];
-    $("#main-content").scrollTop(0);
     $("#main-content").html(
       `<div class="card directory-content" id="person-file">
-  <img class="card-img-top" src='images/staffpics/staffphoto_id${person.id}.jpg' alt="${person.firstName} ${person.lastName}">
-  <div id="person-file-body">
-    <h2 class="card-title">${person.firstName} ${person.lastName}</h2>
-      <ul id="person-file-info">
-      <li>Location: ${person.location}</li>
-      <li>Department: ${person.department}</li>
-      <li>Email: ${person.email}</li>
-      </ul>
-   
-  </div>
- 
-</div>`
+      <img
+        class="card-img-top"
+        src="images/staffpics/staffphoto_id${person.id}.jpg"
+        alt="${person.firstName} ${person.lastName}"
+      />
+      <div id="person-file-body">
+        <h2 class="card-title">${person.firstName} ${person.lastName}</h2>
+        <ul id="person-file-info">
+          <li id="location-info">Location: ${person.location}</li>
+          <li id="department-info">Department: ${person.department}</li>
+          <li id="email-info">Email: ${person.email}</li>
+        </ul>
+        <div class="btn-group" role="group" aria-label="Basic example">
+        <button id="${person.id}" type="button" class="btn btn-primary edit">Edit Details</button>
+        <button id="${person.id}" type="button" class="btn btn-secondary offboard">Offboard</button>
+      </div>
+    </div>`
     );
+    $(".edit").on("click", function () {
+      editPerson($(this).attr("id"));
+    });
+    $(".offboard").on("click", function () {
+      offboardPerson($(this).attr("id"));
+    });
     $("#search-bar").empty();
-    document.getElementById("main-content").scrollIntoView();
+    $(".directory-content").css("margin-top", marginTop[0]);
+    scrollReset();
   });
 };
 
 const loadPage = (pageId) => {
   switch (pageId) {
+    case "dashboard":
+      loadDashboard();
+      break;
     case "personnel":
       loadPersonnelPage();
+      break;
+    case "reports":
+      loadReportsPage();
+      break;
+    case "onboard":
+      loadOnboardPage();
+      break;
     default:
       loadDashboard();
   }
@@ -307,7 +308,10 @@ const loadPage = (pageId) => {
 $(document).ready(function () {
   $(".icon").on("click", function () {
     $("#page-title").text($(this).attr("value"));
+    $("#main-content").empty();
+    $("#personnel-button-container").remove();
     loadPage($(this).attr("id"));
+    $(".directory-content").css("margin-top", marginTop[0]);
   });
   $(document).on("click", ".headshot", function () {
     console.log($(this).attr("id"));

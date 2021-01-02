@@ -1,18 +1,15 @@
-<div
-  id="search-bar"
-  style="margin-top: 3px; width: 100%; padding-right: 3px; display: flex"
->
-  <form class="form-inline">
-    <input
-      id="name-search"
-      class="form-control mr-sm-1"
-      type="search"
-      spellcheck="false"
-      placeholder="Search"
-      aria-label="Search"
-    />
-    <select class="custom-select" id="department-selector">
-      <option selected>All Departments</option>
-    </select>
-  </form>
+<div class="card directory-content" id="person-file">
+  <img
+    class="card-img-top"
+    src="images/staffpics/staffphoto_id${person.id}.jpg"
+    alt="${person.firstName} ${person.lastName}"
+  />
+  <div id="person-file-body">
+    <h2 class="card-title">${person.firstName} ${person.lastName}</h2>
+    <ul id="person-file-info">
+      <li>Location: ${person.location}</li>
+      <li>Department: ${person.department}</li>
+      <li>Email: ${person.email}</li>
+    </ul>
+  </div>
 </div>

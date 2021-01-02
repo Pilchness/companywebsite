@@ -27,19 +27,51 @@ h3 {
   background: black;
 }
 
-main {
-  background: black;
-  z-index: 25;
-}
 #logo {
-  width: 40vw;
+  width: 50vw;
   min-width: 250px;
   max-width: 1200px;
   height: auto;
-  z-index: 300;
+  z-index: 5000;
   position: fixed;
   top: 0;
   left: 0;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+#personnel-button-container {
+  margin-left: 0px;
+  float: right;
+}
+
+#main-content-header {
+  position: fixed;
+  top: 90px;
+  right: 0px;
+  left: 70px;
+  width: calc(100vw - 70px);
+  background: black;
+  display: grid;
+  place-items: center;
+  color: white;
+  height: auto;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  z-index: 4000;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.left-sidebar {
+  /* width: 10vw;
+  min-width: 50px; */
+  max-width: 100px;
+  background: black;
+  height: 10000px;
+  z-index: 3000;
 }
 
 header {
@@ -47,23 +79,20 @@ header {
   position: fixed;
   left: 0;
   top: 0;
-  height: 14vh;
+  height: 12vh;
   min-height: 100px;
   max-height: 500px;
   width: 100vw;
-  z-index: 50;
+  z-index: 1;
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
 }
 
-.left-sidebar {
-  /* width: 10vw;
-  min-width: 50px;
-  max-width: 100px; */
+main {
   background: black;
-  height: 10000px;
-  z-index: 100;
+  z-index: 0;
+  margin-right: 2px;
 }
 
 #sidebar-holder {
@@ -92,31 +121,13 @@ header {
   margin: 10px 5px;
 }
 
-#main-content-header {
-  position: fixed;
-  top: 100px;
-  right: 0px;
-  left: 70px;
-  width: calc(100vw - 70px);
-  background: black;
-  display: grid;
-  place-items: center;
-  color: white;
-  height: auto;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-  z-index: 100;
-  padding-left: 5px;
-}
-
 #page-title {
   text-align: center;
   color: honeydew;
   font-weight: 700;
   font-size: 1em;
   margin: 10px;
+  z-index: 99999;
 }
 
 #personnel-button-container {
@@ -126,6 +137,7 @@ header {
 .personnel-button {
   background-color: gray;
   display: grid;
+  padding-top: 4px;
   place-items: center;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
@@ -149,6 +161,14 @@ a {
 
 a:hover {
   opacity: 50%;
+}
+
+.btn-group {
+  margin-top: 3px;
+}
+
+.btn {
+  font-size: 0.8em;
 }
 
 .card-body {
@@ -203,7 +223,6 @@ a:hover {
 
 .directory-content {
   margin-left: 0;
-  margin-top: 170px;
   padding: 2px;
 }
 
@@ -223,6 +242,11 @@ a:hover {
 
 #person-file-info > li {
   width: 70vw;
+}
+
+.form-control,
+.custom-select {
+  font-size: 0.8em;
 }
 
 .dept-photo,
@@ -262,16 +286,28 @@ li {
   #main-body {
     grid-template-columns: minmax(90px, 10%) 1fr;
   }
+
+  #personnel-button-container {
+    margin-left: 80px;
+  }
 }
 
-@media only screen and (min-width: 2000px) {
-  .left-sidebar {
-    min-width: 400px;
+@media only screen and (min-width: 1000px) {
+  .icon {
+    width: 140px;
+    height: 140px;
+    margin: 40px 10px;
   }
 
-  .icon {
-    max-width: 200px;
-    max-height: 200px;
-    margin: 40px 10px;
+  header {
+    height: 250px;
+  }
+
+  #main-content-header {
+    top: 250px;
+  }
+
+  #main-content {
+    margin-top: 200px;
   }
 }
