@@ -1,104 +1,141 @@
 <?php
 
-	// remove next two lines for production
-	
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+// remove next two lines for production
 
-	$executionStartTime = microtime(true);
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
-	include("config.php");
+$executionStartTime = microtime(true);
 
-	header('Content-Type: application/json; charset=UTF-8');
+include("config.php");
 
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+header('Content-Type: application/json; charset=UTF-8');
 
-	if (mysqli_connect_errno()) {
-		
-		$output['status']['code'] = "300";
-		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
-		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-		$output['data'] = [];
+$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
-		mysqli_close($conn);
+if (mysqli_connect_errno()) {
 
-		echo json_encode($output);
+	$output['status']['code'] = "300";
+	$output['status']['name'] = "failure";
+	$output['status']['description'] = "database unavailable";
+	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+	$output['data'] = [];
 
-		exit;
+	mysqli_close($conn);
 
-	}	
+	echo json_encode($output);
 
-	switch ($_POST['querytype']) {
-		case 'personnel':
-			if($_POST['search'] === 'all_personnel' || $_POST['search'] === '') {
-				
-					$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+	exit;
+}
+
+switch ($_POST['querytype']) {
+	case 'personnel':
+
+		if ($_POST['search'] === 'all_personnel' || $_POST['search'] === '') {
+			if ($_POST['param'] == 0) {
+
+				$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
 								FROM personnel p 
 								LEFT JOIN department d ON (d.id = p.departmentID) 
 								LEFT JOIN location l ON (l.id = d.locationID) 
-								ORDER BY p.lastName, p.firstName, d.name, l.name'; 
-				
-			} else {
-					$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
-								FROM personnel p
-								LEFT JOIN department d ON (d.id = p.departmentID) 
-								LEFT JOIN location l ON (l.id = d.locationID) 
-								WHERE p.firstName LIKE "%' . $_POST['search'] . '%"
-								OR p.lastName LIKE "%' . $_POST['search'] . '%"
-								OR p.email LIKE "%' . $_POST['search'] . '%"
 								ORDER BY p.lastName, p.firstName, d.name, l.name';
+			} else {
+				$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+				FROM personnel p
+				LEFT JOIN department d ON (d.id = p.departmentID) 
+				LEFT JOIN location l ON (l.id = d.locationID) 
+				WHERE d.id = ' . $_POST['param'] . '
+				ORDER BY p.lastName, p.firstName, d.name, l.name';
 			}
-			break;
+		} else {
+			if ($_POST['param'] == 0) {
+				$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+				FROM personnel p
+				LEFT JOIN department d ON (d.id = p.departmentID) 
+				LEFT JOIN location l ON (l.id = d.locationID) 
+				WHERE p.firstName LIKE "%' . $_POST['search'] . '%"
+				OR p.lastName LIKE "%' . $_POST['search'] . '%"
+				OR p.email LIKE "%' . $_POST['search'] . '%"
+				ORDER BY p.lastName, p.firstName, d.name, l.name';
+			} else {
+				$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+									FROM personnel p
+									LEFT JOIN department d ON (d.id = p.departmentID) 
+									LEFT JOIN location l ON (l.id = d.locationID) 
+									WHERE d.id = ' . $_POST['param'] . '
+									AND (p.firstName LIKE "%' . $_POST['search'] . '%"
+									OR p.lastName LIKE "%' . $_POST['search'] . '%"
+									OR p.email LIKE "%' . $_POST['search'] . '%")
+									ORDER BY p.lastName, p.firstName, d.name, l.name';
+			}
+		}
+		break;
 
-			case 'department':
-				if($_POST['search'] === 'all') {
-					$query = 'SELECT id, name, locationID 
+	case 'department':
+		if ($_POST['search'] === 'all') {
+			$query = 'SELECT id, name, locationID 
 					FROM department';
-				} else {
-					$query = 'SELECT * FROM personnel p
-					WHERE p.departmentID = ' . $_POST['search']; 
-				};
-			break;
-		
-		default:
-			echo ('querytype error');
-			break;
-	}
+		} else {
+			$query = 'SELECT * FROM personnel p
+					WHERE p.departmentID = ' . $_POST['search'];
+		};
+		break;
 
-	$result = $conn->query($query);
-	
-	if (!$result) {
+	case 'location':
+		if ($_POST['search'] === 'all') {
+			$query = 'SELECT id, name
+					FROM location';
+		} else {
+			$query = 'SELECT p.id, p.lastName, p.firstName, d.name as department, l.name as location 
+					FROM personnel p
+					LEFT JOIN department d ON (d.id = p.departmentID) 
+					LEFT JOIN location l ON (l.id = d.locationID) 
+					WHERE l.id = ' . $_POST['search'];
+		};
+		break;
 
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
+	case 'id':
+		$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+				FROM personnel p 
+				LEFT JOIN department d ON (d.id = p.departmentID) 
+				LEFT JOIN location l ON (l.id = d.locationID)
+				WHERE p.id =' . $_POST['search'];
+		break;
 
-		mysqli_close($conn);
+	default:
+		echo ('querytype error');
+		break;
+}
 
-		echo json_encode($output); 
+$result = $conn->query($query);
 
-		exit;
+if (!$result) {
 
-	}
-   
-   	$data = [];
+	$output['status']['code'] = "400";
+	$output['status']['name'] = "executed";
+	$output['status']['description'] = "query failed";
+	$output['data'] = [];
 
-	while ($row = mysqli_fetch_assoc($result)) {
-
-		array_push($data, $row);
-
-	}
-
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $data;
-	
 	mysqli_close($conn);
 
-	echo json_encode($output); 
+	echo json_encode($output);
 
-?>
+	exit;
+}
+
+$data = [];
+
+while ($row = mysqli_fetch_assoc($result)) {
+
+	array_push($data, $row);
+}
+
+$output['status']['code'] = "200";
+$output['status']['name'] = "ok";
+$output['status']['description'] = "success";
+$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+$output['data'] = $data;
+
+mysqli_close($conn);
+
+echo json_encode($output);

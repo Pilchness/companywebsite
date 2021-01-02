@@ -7,6 +7,11 @@ body {
   background-color: #000333;
 }
 
+h2 {
+  color: black;
+  font-size: 1em;
+}
+
 h3 {
   font-size: 0.8em;
 }
@@ -160,6 +165,7 @@ a:hover {
 
 .person-card-text {
   font-size: 0.6em;
+  padding-left: 2px;
 }
 
 .dept-card-body {
@@ -170,7 +176,8 @@ a:hover {
   flex-direction: row;
 }
 
-.dept-list {
+.dept-section,
+.location-section {
   columns: 2;
   -webkit-columns: 2;
   -moz-columns: 2;
@@ -194,15 +201,40 @@ a:hover {
   font-size: 2vw;
 }
 
-#main-directory,
-#department-list {
+.directory-content {
   margin-left: 0;
   margin-top: 170px;
   padding: 2px;
 }
 
-.dept-photo {
-  padding: 1px;
+#person-file {
+  width: 98%;
+  margin-left: 5px;
+}
+
+#person-file-body {
+  padding: 4px;
+}
+
+#person-file-info {
+  color: black;
+  font-size: 0.8em;
+}
+
+#person-file-info > li {
+  width: 70vw;
+}
+
+.dept-photo,
+.location-photo {
+  padding: 2px;
+  display: flex;
+  flex-direction: row;
+  background-color: blanchedalmond;
+  margin: 1px;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 ul {
