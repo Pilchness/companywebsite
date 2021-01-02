@@ -95,7 +95,7 @@ switch ($_POST['querytype']) {
 		break;
 
 	case 'id':
-		$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+		$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location, l.id as locid 
 				FROM personnel p 
 				LEFT JOIN department d ON (d.id = p.departmentID) 
 				LEFT JOIN location l ON (l.id = d.locationID)

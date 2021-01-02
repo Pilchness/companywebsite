@@ -243,8 +243,26 @@ const loadPersonnelPage = () => {
   });
 };
 
-const editPerson = (id) => {
+const editPerson = async (id) => {
   console.log("editing " + id);
+  const locationSelection = `<select
+  style="flex: 1; border-radius: 5px"
+  class="custom-select"
+  id="location-selector"
+  ></select>`;
+  let currentLocation = $("#location-info").attr("value");
+  $("#location-info").replaceWith(
+    `<label>Location: </label> ${locationSelection}`
+  );
+  locationDirectoryQuery.getData("all").then((response) => {
+    console.log(response, currentLocation);
+    response.forEach((location) => {
+      $("#location-selector").append(
+        `<option id="${location.id}" selected=''>${location.name}</option>`
+      );
+    });
+  });
+  $(`#location-selector option[id=2]`).attr("selected", "selected");
 };
 
 const offboardPerson = (id) => {
@@ -254,6 +272,7 @@ const offboardPerson = (id) => {
 const showPersonFile = async (id) => {
   idQuery.getData(id).then((response) => {
     let person = response[0];
+    console.log(person);
     $("#main-content").html(
       `<div class="card directory-content" id="person-file">
       <img
@@ -264,7 +283,7 @@ const showPersonFile = async (id) => {
       <div id="person-file-body">
         <h2 class="card-title">${person.firstName} ${person.lastName}</h2>
         <ul id="person-file-info">
-          <li id="location-info">Location: ${person.location}</li>
+          <li id="location-info" value="${person.locid}">Location: ${person.location}</li>
           <li id="department-info">Department: ${person.department}</li>
           <li id="email-info">Email: ${person.email}</li>
         </ul>
