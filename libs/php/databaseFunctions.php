@@ -124,10 +124,12 @@ switch ($_POST['querytype']) {
 		if ($_POST['operation'] == 'delete') {
 			switch ($_POST['data']) {
 				case 'id':
+
 					if ($_POST['id'] !== 0) {
+						echo ('id_is' . $_POST['id']);
 						$query = 'DELETE 
 						FROM personnel
-						WHERE id = "' . $_POST['id'] . '"';
+						WHERE id = ' . $_POST['id'];
 					} else {
 						exit('Could Not Delete Person');
 					}
@@ -155,9 +157,10 @@ switch ($_POST['querytype']) {
 					break;
 			}
 		}
+		break;
 
 	default:
-		exit('Invalid Search');
+		exit('Invalid Database Query');
 		break;
 }
 

@@ -49,7 +49,13 @@ class DatabaseQuery {
     });
   };
 
-  deleteData = async (id = '0', department = '0', location = '0') => {
+  deleteData = async (
+    deleteType,
+    id = '0',
+    department = '0',
+    location = '0'
+  ) => {
+    console.log(id);
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -58,12 +64,13 @@ class DatabaseQuery {
         data: {
           operation: 'delete',
           querytype: this.querytype,
+          data: deleteType,
           id: id,
           department: department,
           location: location
         },
         success: function (result) {
-          resolve(result.data);
+          resolve(result);
         },
         error: function (error) {
           reject(error);
@@ -459,13 +466,24 @@ const offboardPerson = async (id, name) => {
 </div>
 </div>`);
   $('#delete-person-warning').alert();
-  $('#confirm-delete-person').on('click', function () {
-    console.log(`${name} has been deleted!`);
+  $('#confirm-delete-person').on('click', function (e) {
+    $('#delete-person-warning').remove();
     e.stopPropagation();
-    errorDisplay(
-      { responseText: `${name} has been removed from the database.` },
-      'green'
-    );
+
+    deletePersonnel
+      .deleteData('id', id)
+      .then(() => {
+        errorDisplay(
+          {
+            responseText: `${name} has been successfully removed from the database.`
+          },
+          'green'
+        );
+      })
+      .catch((error) => {
+        errorDisplay(error);
+        console.log(error.responseText);
+      });
   });
   $('#cancel-delete-person').on('click', function (e) {
     $('#delete-person-warning').remove();
@@ -473,10 +491,6 @@ const offboardPerson = async (id, name) => {
     errorDisplay({ responseText: `${name} has NOT been deleted.` }, 'green');
   });
 };
-//   deletePersonnel.deleteData(id).then((response) => {
-//     console.log(response);
-//   });
-// };
 
 const showPersonFile = async (id) => {
   idQuery
