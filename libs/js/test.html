@@ -1,15 +1,37 @@
-<div class="card directory-content" id="person-file">
-  <img
-    class="card-img-top"
-    src="images/staffpics/staffphoto_id${person.id}.jpg"
-    alt="${person.firstName} ${person.lastName}"
-  />
-  <div id="person-file-body">
-    <h2 class="card-title">${person.firstName} ${person.lastName}</h2>
-    <ul id="person-file-info">
-      <li>Location: ${person.location}</li>
-      <li>Department: ${person.department}</li>
-      <li>Email: ${person.email}</li>
-    </ul>
-  </div>
+<div id="form-container">
+  <p class="body-text">
+    To add a new person to the database, complete their details below and then
+    click the add button.
+  </p>
+  <form>
+    <div class="form-group">
+      <label class="form-label" for="onboard-first-name">First Name</label>
+      <input type="text" class="form-control" id="onboard-first-name" />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="onboard-last-name">Last Name</label>
+      <input type="text" class="form-control" id="onboard-last-name" />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="onboard-email">Email</label>
+      <input type="email" class="form-control" id="onboard-email" />
+    </div>
+    <div class="custom-file">
+      <label class="custom-file-label form-label" for="headshot-photo"
+        >Upload headshot photo (max 100kb)</label
+      >
+      <input type="file" class="custom-file-input" id="headshot-photo" />
+    </div>
+    <select
+      style="flex: 1; border-radius: 5px"
+      class="custom-select"
+      id="location-selector"
+    ></select>
+
+    <select
+      style="flex: 1; border-radius: 5px"
+      class="custom-select"
+      id="department-selector"
+    ></select>
+  </form>
 </div>

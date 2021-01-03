@@ -25,6 +25,7 @@ h3 {
 #main-content {
   overflow: scroll;
   background: black;
+  margin-top: 250px;
 }
 
 #logo {
@@ -297,6 +298,42 @@ li {
 
 #search-icon {
   margin: 2px;
+}
+
+.body-text {
+  color: white;
+  font-size: 0.8em;
+  padding: 4px;
+  margin-bottom: 0;
+}
+
+form {
+  color: white;
+}
+
+#form-container {
+  width: 80%;
+}
+
+.form-label {
+  padding: 0;
+  margin: 0 0 0 3px;
+  font-size: 0.8em;
+}
+
+.custom-file-label {
+  font-size: 0.6em;
+}
+
+#file-upload-button,
+.custom-file-input {
+  font-size: 0.8em;
+}
+
+#page-content {
+  margin-top: 140px;
+  width: calc(100vw - 70px);
+  color: white;
 }
 
 @media only screen and (min-width: 750px) {

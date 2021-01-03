@@ -4,7 +4,6 @@ class DatabaseQuery {
   }
 
   getData = async (search, param = 0) => {
-    console.log(search, param);
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -55,7 +54,6 @@ class DatabaseQuery {
     department = '0',
     location = '0'
   ) => {
-    console.log(id);
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -85,11 +83,21 @@ let marginTop = ['162px', '198px'];
 
 const scrollReset = () => {
   if ($('#main-content').length) {
-    document.getElementById('main-content').scrollIntoView();
+    document.getElementById('main-content').scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
+  if ($('#page-content').length) {
+    document.getElementById('page-content').scrollIntoView({
+      behavior: 'smooth',
+      block: 'end'
+    });
   }
 };
 
 const errorDisplay = (error, color = 'red') => {
+  console.log(error);
   $('#main-content-header').append(
     `<span id="error" style="color: ${color}">${error.responseText}</span>`
   );
@@ -114,9 +122,76 @@ const idQuery = new DatabaseQuery('id');
 const personnelUpdate = new DatabaseQuery('update');
 const deletePersonnel = new DatabaseQuery('delete');
 
-departmentDirectoryQuery.getData('all').then((result) => {
-  console.log(result);
-});
+const updateProfileDepartmentList = async (location = 'all', department) => {
+  departmentDirectoryQuery
+    .getData(location, 'location')
+    .then((response) => {
+      response.forEach((dept) => {
+        if (dept.name !== department) {
+          $('#department-selector').append(
+            `<option value="${dept.id}">${shortenDepartmentString(
+              dept.name,
+              20
+            )}</option>`
+          );
+        }
+      });
+    })
+    .catch((error) => {
+      errorDisplay(error);
+    });
+};
+
+const createLocationDropdown = async (location) => {
+  locationDirectoryQuery
+    .getData('all')
+    .then((response) => {
+      response.forEach((loc) => {
+        if (loc.name !== location) {
+          $('#location-selector').append(
+            `<option value="${loc.id}">${loc.name}</option>`
+          );
+        }
+      });
+    })
+    .catch((error) => {
+      errorDisplay(error);
+    });
+};
+
+const updateLocationAndDepartmentSelectors = (locid, department) => {
+  $('#location-selector').on('change', function () {
+    let selectedLocation = $('#location-selector :selected').attr('value');
+    $('#department-selector').empty();
+    if (selectedLocation === '0') {
+      $('#department-selector').append(
+        `<option id="current-department" value="0" selected>${shortenDepartmentString(
+          department,
+          10
+        )} (current)</option>`
+      );
+      updateProfileDepartmentList(locid, department);
+    } else {
+      updateProfileDepartmentList(selectedLocation, department);
+    }
+  });
+};
+
+const handleEmailInput = (email) => {
+  $('#email-info').replaceWith(
+    `<label>Email: </label> <input id="email-input" style="width: 14em" value="${email}" spellcheck="false"></input>`
+  );
+  $('#email-input').on('keyup', function () {
+    const emailvalidate = new RegExp(
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    );
+    if (emailvalidate.test($(this).val())) {
+      $('#confirm-changes').removeAttr('disabled');
+    } else {
+      $('#confirm-changes').attr('disabled', true);
+    }
+  });
+};
 
 const loadDashboard = () => {
   console.log('loading dashboard');
@@ -128,6 +203,60 @@ const loadReportsPage = () => {
 
 const loadOnboardPage = () => {
   console.log('loading onboard');
+  $('#main-content').replaceWith(
+    `<div id="page-content"><div id="form-container">
+    <p class="body-text">
+      To add a new person to the database, complete their details below and then
+      click the add button.
+    </p>
+    <form>
+      <div class="form-group">
+        <label class="form-label" for="onboard-first-name">First Name</label>
+        <input type="text" class="form-control" id="onboard-first-name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="onboard-last-name">Last Name</label>
+        <input type="text" class="form-control" id="onboard-last-name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="onboard-email">Email</label>
+        <input type="email" class="form-control" id="onboard-email" />
+      </div>
+      <div>
+      <label class="form-label" for="location-selector">Location</label>
+      <br>
+      <select
+      style="flex: 1; border-radius: 5px"
+      class="custom-select"
+      id="location-selector"
+    ></select></div>
+    <div>
+    <label class="form-label" for="department-selector">Department</label>
+    <br>
+    <select
+      style="flex: 1; border-radius: 5px"
+      class="custom-select"
+      id="department-selector"
+    ></select>
+    </div>
+      <div class="custom-file">
+        <label class="custom-file-label form-label" for="headshot-photo"
+          >Upload headshot photo (max 100kb)</label
+        >
+        <input type="file" class="custom-file-input" id="headshot-photo" />
+      </div>
+     
+    </form>
+  </div></div>`
+  );
+  // $('#main-content').css('margin-top', '200px');
+  // $('#main-content').css('overflow', 'hidden');
+  // $('main').css('overflow', 'hidden');
+  createLocationDropdown();
+  updateProfileDepartmentList();
+  updateLocationAndDepartmentSelectors();
+  handleEmailInput();
+  scrollReset();
 };
 
 const mainDirectory = async (search, department) => {
@@ -223,9 +352,7 @@ const locationList = async () => {
 };
 
 const populateDepartmentSelector = () => {
-  console.log('departments');
   departmentDirectoryQuery.getData('all').then((response) => {
-    console.log(response);
     response.forEach((department) => {
       $('#department-search-select').append(
         `<option id="${department.id}">${shortenDepartmentString(
@@ -296,11 +423,10 @@ const toggleSearchBar = async () => {
 };
 
 const updatePersonRecord = async (id, department, email) => {
-  console.log(id, department, email);
   personnelUpdate
     .updateData(id, email, department)
     .then(() => {
-      console.log('database updated');
+      errorDisplay({ responseText: `Database Update Success` }, 'green');
     })
     .catch((error) => {
       errorDisplay(error);
@@ -308,6 +434,9 @@ const updatePersonRecord = async (id, department, email) => {
 };
 
 const loadPersonnelPage = () => {
+  if ($('#page-content').length) {
+    $('#page-content').replaceWith(`<div id="main-content"></div>`);
+  }
   if (!$('#personnel-button-container').length) {
     $('#main-content-header').append(`
       <div id="personnel-button-container" class="nav nav-tabs">
@@ -380,81 +509,14 @@ const editPerson = async (id, location, department, email, locid) => {
   $('#department-info').replaceWith(
     `<label>Department: </label> ${departmentSelection}`
   );
-  locationDirectoryQuery
-    .getData('all')
-    .then((response) => {
-      console.log(response);
-      response.forEach((loc) => {
-        if (loc.name !== location) {
-          $('#location-selector').append(
-            `<option value="${loc.id}">${loc.name}</option>`
-          );
-        }
-      });
-    })
-    .catch((error) => {
-      errorDisplay(error);
-    });
 
-  const updateProfileDirectoryList = async (location) => {
-    departmentDirectoryQuery
-      .getData(location, 'location')
-      .then((response) => {
-        response.forEach((dept) => {
-          if (dept.name !== department) {
-            $('#department-selector').append(
-              `<option value="${dept.id}">${shortenDepartmentString(
-                dept.name,
-                20
-              )}</option>`
-            );
-          }
-        });
-      })
-      .catch((error) => {
-        errorDisplay(error);
-      });
-  };
-
-  updateProfileDirectoryList(locid);
-
-  $('#location-selector').on('change', function () {
-    let selectedLocation = $('#location-selector :selected').attr('value');
-    console.log(typeof selectedLocation);
-    $('#department-selector').empty();
-    if (selectedLocation === '0') {
-      console.log(locid);
-      $('#department-selector').append(
-        `<option id="current-department" value="0" selected>${shortenDepartmentString(
-          department,
-          10
-        )} (current)</option>`
-      );
-      updateProfileDirectoryList(locid);
-      console.log('currentlocation');
-    } else {
-      updateProfileDirectoryList(selectedLocation);
-    }
-  });
-  $('#email-info').replaceWith(
-    `<label>Email: </label> <input id="email-input" style="width: 10em" value="${email}" spellcheck="false"></input>`
-  );
-  $('#email-input').on('keyup', function () {
-    const emailvalidate = new RegExp(
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-    );
-    if (emailvalidate.test($(this).val())) {
-      console.log('ok');
-      $('#confirm-changes').removeAttr('disabled');
-    } else {
-      console.log('failed');
-      $('#confirm-changes').attr('disabled', true);
-    }
-  });
+  createLocationDropdown(location);
+  updateProfileDepartmentList(locid, department);
+  updateLocationAndDepartmentSelectors(locid, department);
+  handleEmailInput(email);
 };
 
 const offboardPerson = async (id, name) => {
-  console.log('offboarding ' + id);
   $('#main-content-header')
     .append(`<div id="delete-person-warning" class="alert alert-danger" role="alert">
   You are about to offboard <b>${name}</b> and this action cannot be undone.
@@ -482,7 +544,6 @@ const offboardPerson = async (id, name) => {
       })
       .catch((error) => {
         errorDisplay(error);
-        console.log(error.responseText);
       });
   });
   $('#cancel-delete-person').on('click', function (e) {
@@ -497,7 +558,6 @@ const showPersonFile = async (id) => {
     .getData(id)
     .then((response) => {
       let person = response[0];
-      console.log(person);
       $('#main-content').html(
         `<div class="card directory-content" id="person-file">
       <img
@@ -584,7 +644,6 @@ $(document).ready(function () {
     $('.directory-content').css('margin-top', marginTop[0]);
   });
   $(document).on('click', '.headshot', function () {
-    console.log($(this).attr('id'));
     showPersonFile($(this).attr('id'));
   });
 });
