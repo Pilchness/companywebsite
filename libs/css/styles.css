@@ -167,11 +167,19 @@ a:hover {
 }
 
 .btn-group {
-  margin-top: 3px;
+  height: 30px;
 }
 
 .btn {
   font-size: 0.8em;
+}
+
+label {
+  padding-bottom: 8px;
+}
+
+#email-input {
+  border-radius: 5px;
 }
 
 .card-body {
@@ -283,7 +291,7 @@ ul {
 
 li {
   padding: 0;
-  margin: 0;
+  margin: 2px 0px;
   width: 55vw;
 }
 

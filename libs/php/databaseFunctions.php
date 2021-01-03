@@ -109,16 +109,52 @@ switch ($_POST['querytype']) {
 
 	case 'update':
 
-		if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+		if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) && $_POST['department'] !== '0') {
 			$query = 'UPDATE personnel
-				SET email = "' . $_POST['email'] . '",
-				departmentID = "' . $_POST['department'] . '"
-				WHERE id = "' . $_POST['id'] . '"';
+					SET email = "' . $_POST['email'] . '",
+					departmentID = "' . $_POST['department'] . '"
+					WHERE id = "' . $_POST['id'] . '"';
 		} else {
 			exit('Invalid Email Error');
 		}
 
 		break;
+
+	case 'delete':
+		if ($_POST['operation'] == 'delete') {
+			switch ($_POST['data']) {
+				case 'id':
+					if ($_POST['id'] !== 0) {
+						$query = 'DELETE 
+						FROM personnel
+						WHERE id = "' . $_POST['id'] . '"';
+					} else {
+						exit('Could Not Delete Person');
+					}
+					break;
+
+				case 'department':
+					if ($_POST['department'] !== 0) {
+						$query =
+							'DELETE 
+						FROM personnel
+						WHERE id = "' . $_POST['id'] . '",' .
+							$_POST['department'] . 'NOT IN 
+						(SELECT departmentID FROM personnel)';
+					} else {
+						exit('Could Not Delete Department');
+					}
+					break;
+
+				case 'location':
+					# code...
+					break;
+
+				default:
+					exit('Delete Not Possible');
+					break;
+			}
+		}
 
 	default:
 		exit('Invalid Search');
