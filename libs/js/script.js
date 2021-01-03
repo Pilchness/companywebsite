@@ -83,10 +83,7 @@ let marginTop = ['162px', '198px'];
 
 const scrollReset = () => {
   if ($('#main-content').length) {
-    document.getElementById('main-content').scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
+    document.getElementById('main-content').scrollIntoView();
   }
   if ($('#page-content').length) {
     document.getElementById('page-content').scrollIntoView({
@@ -97,7 +94,6 @@ const scrollReset = () => {
 };
 
 const errorDisplay = (error, color = 'red') => {
-  console.log(error);
   $('#main-content-header').append(
     `<span id="error" style="color: ${color}">${error.responseText}</span>`
   );
@@ -177,19 +173,69 @@ const updateLocationAndDepartmentSelectors = (locid, department) => {
   });
 };
 
+const emailValidate = new RegExp(
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+);
+
+const nameValidate = new RegExp(
+  `^[a-zA-Z'\-\pL]+(?:(?! {2})[a-zA-Z'\-\pL ])*[a-zA-Z'\-\pL]+$`
+);
+
 const handleEmailInput = (email) => {
   $('#email-info').replaceWith(
     `<label>Email: </label> <input id="email-input" style="width: 14em" value="${email}" spellcheck="false"></input>`
   );
   $('#email-input').on('keyup', function () {
-    const emailvalidate = new RegExp(
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-    );
-    if (emailvalidate.test($(this).val())) {
+    if (emailValidate.test($(this).val())) {
       $('#confirm-changes').removeAttr('disabled');
     } else {
       $('#confirm-changes').attr('disabled', true);
     }
+  });
+};
+
+const handleOnboardInput = () => {
+  let first = 0;
+  let last = 0;
+  let email = 0;
+  $('#onboard-first-name').on('keyup', function () {
+    console.log($(this).val());
+    if (nameValidate.test($(this).val())) {
+      console.log('first name validated');
+      first = 1;
+    } else {
+      first = 0;
+    }
+  });
+  $('#onboard-last-name').on('keyup', function () {
+    console.log($(this).val());
+    if (nameValidate.test($(this).val())) {
+      console.log('last name validated');
+      last = 2;
+    } else {
+      last = 0;
+    }
+  });
+  $('#onboard-email').on('keyup', function () {
+    console.log($(this).val());
+    if (emailValidate.test($(this).val())) {
+      console.log('email validated');
+      email = 4;
+    } else {
+      console.log('not acceptable');
+      email = 0;
+    }
+  });
+  const validate = (total) => {
+    console.log(total);
+    if (total === 7) {
+      $('#new-onboard').removeAttr('disabled');
+    } else {
+      $('#new-onboard').attr('disabled', true);
+    }
+  };
+  $('#page-content').on('keyup', function () {
+    validate(first + last + email);
   });
 };
 
@@ -202,12 +248,12 @@ const loadReportsPage = () => {
 };
 
 const loadOnboardPage = () => {
-  console.log('loading onboard');
   $('#main-content').replaceWith(
-    `<div id="page-content"><div id="form-container">
+    `<div id="page-content">
+    <div id="form-container">
     <p class="body-text">
       To add a new person to the database, complete their details below and then
-      click the add button.
+      click the <strong>Add Employee</strong> button.
     </p>
     <form>
       <div class="form-group">
@@ -245,7 +291,7 @@ const loadOnboardPage = () => {
         >
         <input type="file" class="custom-file-input" id="headshot-photo" />
       </div>
-     
+      <button style="float: right; margin-right: -30px" id="new-onboard" class="btn btn-success" type="submit" disabled>Add Employee</button>
     </form>
   </div></div>`
   );
@@ -255,7 +301,7 @@ const loadOnboardPage = () => {
   createLocationDropdown();
   updateProfileDepartmentList();
   updateLocationAndDepartmentSelectors();
-  handleEmailInput();
+  handleOnboardInput();
   scrollReset();
 };
 

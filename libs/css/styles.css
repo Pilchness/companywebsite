@@ -25,7 +25,6 @@ h3 {
 #main-content {
   overflow: scroll;
   background: black;
-  margin-top: 250px;
 }
 
 #logo {
@@ -53,8 +52,8 @@ h3 {
   left: 70px;
   width: calc(100vw - 70px);
   background: black;
-  display: grid;
-  place-items: center;
+  /* display: grid;
+  place-items: center; */
   color: white;
   height: auto;
   display: flex;
@@ -305,6 +304,7 @@ li {
   font-size: 0.8em;
   padding: 4px;
   margin-bottom: 0;
+  width: 250px;
 }
 
 form {
