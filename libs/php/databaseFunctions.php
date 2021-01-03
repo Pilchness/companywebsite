@@ -109,13 +109,19 @@ switch ($_POST['querytype']) {
 
 	case 'update':
 
-		$query = 'UPDATE personnel
-				SET email = "' . $_POST['email'] . '"
-			WHERE id = "' . $_POST['id'] . '"';
+		if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+			$query = 'UPDATE personnel
+				SET email = "' . $_POST['email'] . '",
+				departmentID = "' . $_POST['department'] . '"
+				WHERE id = "' . $_POST['id'] . '"';
+		} else {
+			exit('Invalid Email Error');
+		}
+
 		break;
 
 	default:
-		echo ('querytype error');
+		exit('Invalid Search');
 		break;
 }
 

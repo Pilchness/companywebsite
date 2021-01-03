@@ -59,6 +59,15 @@ const scrollReset = () => {
   }
 };
 
+const errorDisplay = (error) => {
+  $('#main-content-header').append(
+    `<span id="error" style="color: red">${error.responseText}</span>`
+  );
+  $(document).on('click', function () {
+    $('#error').remove();
+  });
+};
+
 const shortenDepartmentString = (departmentName, max) => {
   let departmentTextString = departmentName;
   let maxLength = max;
@@ -92,10 +101,12 @@ const loadOnboardPage = () => {
 
 const mainDirectory = async (search, department) => {
   $('#main-directory').empty();
-  personnelDirectoryQuery.getData(search, department).then((response) => {
-    response.forEach((person) => {
-      $('#main-directory')
-        .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
+  personnelDirectoryQuery
+    .getData(search, department)
+    .then((response) => {
+      response.forEach((person) => {
+        $('#main-directory')
+          .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
         <div class="card-header">${person.firstName} ${person.lastName}</div>
         <div class="card-body text-dark">
         <img class="headshot" id="${person.id}" src='images/staffpics/staffphoto_id${person.id}.jpg' width='50px' height='50px'/>
@@ -106,9 +117,12 @@ const mainDirectory = async (search, department) => {
           </ul>
         </div>
       </div>`);
+      });
+      scrollReset();
+    })
+    .catch((error) => {
+      errorDisplay(error);
     });
-    scrollReset();
-  });
 };
 
 const departmentList = async () => {
@@ -134,34 +148,47 @@ const departmentList = async () => {
             );
           });
           scrollReset();
+        })
+        .catch((error) => {
+          errorDisplay(error);
         });
     });
   });
 };
 
 const locationList = async () => {
-  locationDirectoryQuery.getData('all').then((response) => {
-    response.forEach((location) => {
-      $('#location-list')
-        .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
+  locationDirectoryQuery
+    .getData('all')
+    .then((response) => {
+      response.forEach((location) => {
+        $('#location-list')
+          .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
         <div class="card-header">${location.name}</div>
         <div class="dept-card-body text-dark">
           <ul id="personnel-dept-${location.id}" class="location-section">
           </ul>
         </div>
       </div>`);
-      locationDirectoryQuery.getData(location.id).then((response) => {
-        response.forEach((locationMember) => {
-          $(`#personnel-dept-${location.id}`).append(
-            `<div class="location-photo headshot" id="${locationMember.id}">
+        locationDirectoryQuery
+          .getData(location.id)
+          .then((response) => {
+            response.forEach((locationMember) => {
+              $(`#personnel-dept-${location.id}`).append(
+                `<div class="location-photo headshot" id="${locationMember.id}">
             <img src='images/staffpics/staffphoto_id${locationMember.id}.jpg' width="30px" height="30px"/>
             <span class="person-card-text">${locationMember.firstName} ${locationMember.lastName} (${locationMember.department})</span></div>`
-          );
-        });
-        scrollReset();
+              );
+            });
+            scrollReset();
+          })
+          .catch((error) => {
+            errorDisplay(error);
+          });
       });
+    })
+    .catch((error) => {
+      errorDisplay(error);
     });
-  });
 };
 
 const populateDepartmentSelector = () => {
@@ -236,10 +263,15 @@ const toggleSearchBar = async () => {
 };
 
 const updatePersonRecord = async (id, department, email) => {
-  //console.log(id, location, department, email);
-  personnelUpdate.updateData(id, email, department).then(() => {
-    console.log('database updated');
-  });
+  console.log(id, department, email);
+  personnelUpdate
+    .updateData(id, email, department)
+    .then(() => {
+      console.log('database updated');
+    })
+    .catch((error) => {
+      errorDisplay(error);
+    });
 };
 
 const loadPersonnelPage = () => {
@@ -316,32 +348,42 @@ const editPerson = async (id, location, department, email, locid) => {
   $('#department-info').replaceWith(
     `<label>Department: </label> ${departmentSelection}`
   );
-  locationDirectoryQuery.getData('all').then((response) => {
-    console.log(response);
-    response.forEach((loc) => {
-      if (loc.name !== location) {
-        $('#location-selector').append(
-          `<option value="${loc.id}">${loc.name}</option>`
-        );
-      }
-    });
-  });
-
-  const updateDirectoryList = async (location) => {
-    console.log(location);
-    departmentDirectoryQuery.getData(location, 'location').then((response) => {
+  locationDirectoryQuery
+    .getData('all')
+    .then((response) => {
       console.log(response);
-      response.forEach((dept) => {
-        if (dept.name !== department) {
-          $('#department-selector').append(
-            `<option value="${dept.id}">${shortenDepartmentString(
-              dept.name,
-              10
-            )}</option>`
+      response.forEach((loc) => {
+        if (loc.name !== location) {
+          $('#location-selector').append(
+            `<option value="${loc.id}">${loc.name}</option>`
           );
         }
       });
+    })
+    .catch((error) => {
+      errorDisplay(error);
     });
+
+  const updateDirectoryList = async (location) => {
+    console.log(location);
+    departmentDirectoryQuery
+      .getData(location, 'location')
+      .then((response) => {
+        console.log(response);
+        response.forEach((dept) => {
+          if (dept.name !== department) {
+            $('#department-selector').append(
+              `<option value="${dept.id}">${shortenDepartmentString(
+                dept.name,
+                10
+              )}</option>`
+            );
+          }
+        });
+      })
+      .catch((error) => {
+        errorDisplay(error);
+      });
   };
   console.log(locid);
   updateDirectoryList(locid);
@@ -375,7 +417,7 @@ const editPerson = async (id, location, department, email, locid) => {
       $('#confirm-changes').removeAttr('disabled');
     } else {
       console.log('failed');
-      $('#confirm-changes').attr('disabled', true);
+      //$('#confirm-changes').attr('disabled', true);
     }
   });
 };
@@ -385,11 +427,13 @@ const offboardPerson = (id) => {
 };
 
 const showPersonFile = async (id) => {
-  idQuery.getData(id).then((response) => {
-    let person = response[0];
-    console.log(person);
-    $('#main-content').html(
-      `<div class="card directory-content" id="person-file">
+  idQuery
+    .getData(id)
+    .then((response) => {
+      let person = response[0];
+      console.log(person);
+      $('#main-content').html(
+        `<div class="card directory-content" id="person-file">
       <img
         class="card-img-top"
         src="images/staffpics/staffphoto_id${person.id}.jpg"
@@ -409,34 +453,41 @@ const showPersonFile = async (id) => {
         <button id="${person.id}" type="button" class="btn btn-secondary offboard">Offboard</button>
       </div>
     </div>`
-    );
-    $('.edit').on('click', function () {
-      editPerson(
-        $(this).attr('id'),
-        $(this).attr('location'),
-        $(this).attr('dept'),
-        $(this).attr('email'),
-        $(this).attr('locid')
       );
-      $('.edit').replaceWith(
-        `<button type="button" id="confirm-changes" class="btn btn-success confirm">Confirm</button>
-        <button type="button" class="btn btn-danger cancel">Cancel</button>`
-      );
-      $('.confirm').on('click', function () {
-        updatePersonRecord(
-          person.id,
-          $('#department-selector :selected').attr('value'),
-          $('#email-input').val()
+      $('.edit').on('click', function () {
+        editPerson(
+          $(this).attr('id'),
+          $(this).attr('location'),
+          $(this).attr('dept'),
+          $(this).attr('email'),
+          $(this).attr('locid')
         );
+        $('.edit').replaceWith(
+          `<button type="button" id="confirm-changes" class="btn btn-success confirm">Confirm</button>
+        <button type="button" class="btn btn-danger cancel">Cancel</button>`
+        );
+        $('.confirm').on('click', function () {
+          updatePersonRecord(
+            person.id,
+            $('#department-selector :selected').attr('value'),
+            $('#email-input').val()
+          );
+          showPersonFile(person.id);
+        });
+        $('.cancel').on('click', function () {
+          showPersonFile(person.id);
+        });
       });
+      $('.offboard').on('click', function () {
+        offboardPerson($(this).attr('id'));
+      });
+      $('#search-bar').empty();
+      $('.directory-content').css('margin-top', marginTop[0]);
+      scrollReset();
+    })
+    .catch((error) => {
+      errorDisplay(error);
     });
-    $('.offboard').on('click', function () {
-      offboardPerson($(this).attr('id'));
-    });
-    $('#search-bar').empty();
-    $('.directory-content').css('margin-top', marginTop[0]);
-    scrollReset();
-  });
 };
 
 const loadPage = (pageId) => {
