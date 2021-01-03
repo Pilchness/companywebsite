@@ -11,9 +11,32 @@ class DatabaseQuery {
         url: "libs/php/databaseFunctions.php",
         dataType: "json",
         data: {
+          operation: "read",
           querytype: this.querytype,
           search: search,
           param: param,
+        },
+        success: function (result) {
+          resolve(result.data);
+        },
+        error: function (error) {
+          reject(error);
+        },
+      });
+    });
+  };
+
+  updateData = async (id, email) => {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        type: "POST",
+        url: "libs/php/databaseFunctions.php",
+        dataType: "json",
+        data: {
+          operation: "write",
+          querytype: this.querytype,
+          id: id,
+          email: email,
         },
         success: function (result) {
           resolve(result.data);
@@ -33,10 +56,20 @@ const scrollReset = () => {
     document.getElementById("main-content").scrollIntoView();
   }
 };
+
+const shortenDepartmentString = (departmentName, max) => {
+  let departmentTextString = departmentName;
+  let maxLength = max;
+  if (departmentTextString.length > maxLength) {
+    departmentTextString = departmentTextString.substr(0, maxLength) + "...";
+  }
+  return departmentTextString;
+};
 const personnelDirectoryQuery = new DatabaseQuery("personnel");
 const departmentDirectoryQuery = new DatabaseQuery("department");
 const locationDirectoryQuery = new DatabaseQuery("location");
 const idQuery = new DatabaseQuery("id");
+const personnelUpdate = new DatabaseQuery("update");
 
 const loadDashboard = () => {
   console.log("loading dashboard");
@@ -150,14 +183,11 @@ const toggleSearchBar = async () => {
         </div>`);
     departmentDirectoryQuery.getData("all").then((response) => {
       response.forEach((department) => {
-        let departmentTextString = department.name;
-        let maxLength = 14;
-        if (departmentTextString.length > maxLength) {
-          departmentTextString =
-            departmentTextString.substr(0, maxLength) + "...";
-        }
         $("#department-selector").append(
-          `<option id="${department.id}">${departmentTextString}</option>`
+          `<option id="${department.id}">${shortenDepartmentString(
+            department.name,
+            14
+          )}</option>`
         );
       });
     });
@@ -188,6 +218,13 @@ const toggleSearchBar = async () => {
     $(".directory-content").css("margin-top", marginTop[0]);
     visibleSearch = false;
   }
+};
+
+const updatePersonRecord = async (id, location, department, email) => {
+  //console.log(id, location, department, email);
+  personnelUpdate.updateData(id, email).then(() => {
+    console.log("database updated");
+  });
 };
 
 const loadPersonnelPage = () => {
@@ -243,26 +280,53 @@ const loadPersonnelPage = () => {
   });
 };
 
-const editPerson = async (id) => {
-  console.log("editing " + id);
+const editPerson = async (id, location, department, email) => {
+  console.log(id, location, department, email);
   const locationSelection = `<select
   style="flex: 1; border-radius: 5px"
   class="custom-select"
   id="location-selector"
-  ></select>`;
-  let currentLocation = $("#location-info").attr("value");
+  ><option selected>${location} (current)</option></select>\n`;
+  const departmentSelection = `<select
+  style="flex: 1; border-radius: 5px"
+  class="custom-select"
+  id="department-selector"
+  ><option selected>${shortenDepartmentString(
+    department,
+    10
+  )} (current)</option></select>\n`;
   $("#location-info").replaceWith(
     `<label>Location: </label> ${locationSelection}`
   );
+  $("#department-info").replaceWith(
+    `<label>Department: </label> ${departmentSelection}`
+  );
   locationDirectoryQuery.getData("all").then((response) => {
-    console.log(response, currentLocation);
-    response.forEach((location) => {
-      $("#location-selector").append(
-        `<option id="${location.id}" selected=''>${location.name}</option>`
-      );
+    console.log(response);
+    response.forEach((loc) => {
+      if (loc.name !== location) {
+        $("#location-selector").append(
+          `<option value="${loc.id}">${loc.name}</option>`
+        );
+      }
     });
   });
-  $(`#location-selector option[id=2]`).attr("selected", "selected");
+  departmentDirectoryQuery.getData("all").then((response) => {
+    console.log(response);
+    response.forEach((dept) => {
+      if (dept.name !== department) {
+        $("#department-selector").append(
+          `<option value="${dept.id}">${shortenDepartmentString(
+            dept.name,
+            10
+          )}</option>`
+        );
+      }
+    });
+  });
+  $("#email-info").replaceWith(
+    `<label>Email: </label> <input id="email-input" style="width: 10em" value="${email}"></input>`
+  );
 };
 
 const offboardPerson = (id) => {
@@ -283,18 +347,37 @@ const showPersonFile = async (id) => {
       <div id="person-file-body">
         <h2 class="card-title">${person.firstName} ${person.lastName}</h2>
         <ul id="person-file-info">
-          <li id="location-info" value="${person.locid}">Location: ${person.location}</li>
+          <li id="location-info">Location: ${person.location}</li>
           <li id="department-info">Department: ${person.department}</li>
           <li id="email-info">Email: ${person.email}</li>
         </ul>
         <div class="btn-group" role="group" aria-label="Basic example">
-        <button id="${person.id}" type="button" class="btn btn-primary edit">Edit Details</button>
+        <button id="${person.id}" location="${person.location}" 
+              dept="${person.department}" email="${person.email}"
+            type="button" class="btn btn-primary edit">Edit Details</button>
         <button id="${person.id}" type="button" class="btn btn-secondary offboard">Offboard</button>
       </div>
     </div>`
     );
     $(".edit").on("click", function () {
-      editPerson($(this).attr("id"));
+      editPerson(
+        $(this).attr("id"),
+        $(this).attr("location"),
+        $(this).attr("dept"),
+        $(this).attr("email")
+      );
+      $(".edit").replaceWith(
+        `<button type="button" class="btn btn-success confirm">Confirm</button>
+        <button type="button" class="btn btn-danger cancel">Cancel</button>`
+      );
+      $(".confirm").on("click", function () {
+        updatePersonRecord(
+          person.id,
+          $("#location-selector :selected").attr("value"),
+          $("#department-selector :selected").attr("value"),
+          $("#email-input").val()
+        );
+      });
     });
     $(".offboard").on("click", function () {
       offboardPerson($(this).attr("id"));

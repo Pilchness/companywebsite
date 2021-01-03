@@ -102,6 +102,13 @@ switch ($_POST['querytype']) {
 				WHERE p.id =' . $_POST['search'];
 		break;
 
+	case 'update':
+
+		$query = 'UPDATE personnel
+				SET email = "' . $_POST['email'] . '"
+			WHERE id = "' . $_POST['id'] . '"';
+		break;
+
 	default:
 		echo ('querytype error');
 		break;
@@ -123,18 +130,26 @@ if (!$result) {
 	exit;
 }
 
-$data = [];
+if ($_POST['operation'] == 'read') {
 
-while ($row = mysqli_fetch_assoc($result)) {
+	$data = [];
 
-	array_push($data, $row);
+	while ($row = mysqli_fetch_assoc($result)) {
+
+		array_push($data, $row);
+	}
+
+	$output['status']['code'] = "200";
+	$output['status']['name'] = "ok";
+	$output['status']['description'] = "success";
+	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+	$output['data'] = $data;
+} else {
+	$output['status']['code'] = "200";
+	$output['status']['name'] = "ok";
+	$output['status']['description'] = "success";
+	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 }
-
-$output['status']['code'] = "200";
-$output['status']['name'] = "ok";
-$output['status']['description'] = "success";
-$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-$output['data'] = $data;
 
 mysqli_close($conn);
 
