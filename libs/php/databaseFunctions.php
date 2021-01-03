@@ -76,8 +76,13 @@ switch ($_POST['querytype']) {
 			$query = 'SELECT id, name, locationID 
 					FROM department';
 		} else {
-			$query = 'SELECT * FROM personnel p
+			if ($_POST['param'] == 'person') {
+				$query = 'SELECT * FROM personnel p
 					WHERE p.departmentID = ' . $_POST['search'];
+			} else {
+				$query = 'SELECT * FROM department
+					WHERE locationID = ' . $_POST['search'];
+			}
 		};
 		break;
 
