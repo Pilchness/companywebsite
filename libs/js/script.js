@@ -293,11 +293,12 @@ const loadReportsPage = () => {
   console.log('loading reports');
 };
 
-const addNewPersonPhoto = (id) => {
-  $('#new-onboard').click(function (e) {
-    e.preventDefault();
+addNewPersonPhoto = () => {
+  $('#new-onboard').click(function () {
     var fd = new FormData();
     var files = $('#file')[0].files;
+
+    // Check file selected or not
     if (files.length > 0) {
       fd.append('file', files[0]);
 
@@ -305,14 +306,16 @@ const addNewPersonPhoto = (id) => {
         url: 'libs/php/upload.php',
         type: 'post',
         data: fd,
-        fileName: `staffphoto_id${id}`,
         contentType: false,
         processData: false,
         success: function (response) {
-          console.log(response);
-        },
-        error: function (error) {
-          console.log(error);
+          if (response != 0) {
+            console.log(response);
+            //$('#img').attr('src', response);
+            //$('.preview img').show(); // Display image element
+          } else {
+            alert('file not uploaded');
+          }
         }
       });
     } else {
@@ -324,48 +327,48 @@ const addNewPersonPhoto = (id) => {
 const loadOnboardPage = () => {
   $('#main-content').replaceWith(
     `<div id="page-content">
-    <div id="form-container">
-      <p class="body-text">
-        To add a new person to the database, complete their details below and then
-        click the <strong>Add Employee</strong> button.
-      </p>
-      <div>
-  
-        <div class="form-group">
-          <label class="form-label" for="onboard-first-name">First Name</label>
-          <input type="text" class="form-control" id="onboard-first-name" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="onboard-last-name">Last Name</label>
-          <input type="text" class="form-control" id="onboard-last-name" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="onboard-email">Email</label>
-          <input type="email" class="form-control" id="onboard-email" />
-        </div>
-        <div>
-          <label class="form-label" for="location-selector">Location</label>
-          <br>
-          <select style="flex: 1; border-radius: 5px" class="custom-select add" id="location-selector"></select>
-        </div>
-        <div>
-          <label class="form-label" for="department-selector">Department</label>
-          <br>
-          <select style="flex: 1; border-radius: 5px" class="custom-select add" id="department-selector"></select>
-        </div>
-  
-        <form method="post" action="" enctype="multipart/form-data" id="myform">
-          <div class="custom-file">
-            <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
-            <input type="file" class="custom-file-input" id="file" name="file" />
-          </div>
-          <button style="float: right; margin-right: -30px" id="new-onboard" value="Upload" class="btn btn-success button"
-            disabled>Add Employee</button>
+  <div id="form-container">
+    <p class="body-text">
+      To add a new person to the database, complete their details below and then
+      click the <strong>Add Employee</strong> button.
+    </p>
+    <div>
+
+      <div class="form-group">
+        <label class="form-label" for="onboard-first-name">First Name</label>
+        <input type="text" class="form-control" id="onboard-first-name" />
       </div>
-      </form>
+      <div class="form-group">
+        <label class="form-label" for="onboard-last-name">Last Name</label>
+        <input type="text" class="form-control" id="onboard-last-name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="onboard-email">Email</label>
+        <input type="email" class="form-control" id="onboard-email" />
+      </div>
+      <div>
+        <label class="form-label" for="location-selector">Location</label>
+        <br>
+        <select style="flex: 1; border-radius: 5px" class="custom-select add" id="location-selector"></select>
+      </div>
+      <div>
+        <label class="form-label" for="department-selector">Department</label>
+        <br>
+        <select style="flex: 1; border-radius: 5px" class="custom-select add" id="department-selector"></select>
+      </div>
+
+      <form method="post" action="" enctype="multipart/form-data" id="myform">
+        <div class="custom-file">
+          <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
+          <input type="file" class="custom-file-input" id="file" name="file" />
+        </div>
+        <button style="float: right; margin-right: -30px" id="new-onboard" value="Upload" class="btn btn-success button"
+          disabled>Add Employee</button>
     </div>
+    </form>
   </div>
-  </div>`
+</div>
+</div>`
   );
   // $('#main-content').css('margin-top', '200px');
   // $('#main-content').css('overflow', 'hidden');
@@ -374,17 +377,14 @@ const loadOnboardPage = () => {
   updateProfileDepartmentList(1, 1);
   updateLocationAndDepartmentSelectors();
   handleOnboardInput();
-
-  $('#new-onboard').on('click', function (e) {
-    e.preventDefault();
+  addNewPersonPhoto();
+  $('#new-onboard').on('click', function () {
     addNewPersonToDatabase(
       $('#onboard-first-name').val(),
       $('#onboard-last-name').val(),
       $('#onboard-email').val(),
       $('#department-selector.add :selected').attr('value')
-    ).then((response) => {
-      addNewPersonPhoto(response.id);
-      console.log(response.id);
+    ).then(() => {
       errorDisplay(
         {
           responseText: `Employee has been successfully added.`

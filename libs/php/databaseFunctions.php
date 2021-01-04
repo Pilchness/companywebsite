@@ -163,17 +163,14 @@ switch ($_POST['querytype']) {
 		switch ($_POST['table']) {
 			case 'personnel':
 
-				// $nextID = $conn->query('SELECT MAX(id) FROM personnel');
-				// echo (json_encode($nextID));
 				$jobTitle = "";
+				// $newID = $conn->query('SELECT MAX(id) + 1 FROM personnel');
 
 				$query = 'INSERT INTO personnel (firstName, lastName, jobTitle, email, departmentID, id) 
 				SELECT "' . $_POST['firstName'] . '","' . $_POST['lastName'] . '","' . $jobTitle . '","' . $_POST['email'] . '","' . $_POST['departmentID'] .
 					'", MAX(id) + 1 FROM personnel';
-				break;
 
-				// $query = 'SELECT MAX(id) FROM personnel';
-				// break;
+				break;
 
 			case 'department':
 				# code...
@@ -227,10 +224,22 @@ if ($_POST['operation'] == 'read') {
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 	$output['data'] = $data;
 } else {
+
+	$sql =  "SELECT id FROM personnel ORDER BY id DESC LIMIT 1";
+	$result = $conn->query($sql);
+	$lastID = 0;
+	if ($result->num_rows > 0) {
+		while ($row = $result->fetch_assoc()) {
+			$lastID = $row["id"];
+		}
+	}
+
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+	//echo (mysqli_fetch_assoc($newID));
+	rename("../../images/uploads/staffphoto_temp.jpg", "../../images/staffpics/staffphoto_id" . $lastID . ".jpg");
 }
 
 mysqli_close($conn);
