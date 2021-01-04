@@ -159,6 +159,30 @@ switch ($_POST['querytype']) {
 		}
 		break;
 
+	case 'create':
+		switch ($_POST['table']) {
+			case 'personnel':
+
+				$query = 'INSERT INTO personnel (firstName, lastName, email, departmentID) 
+				VALUES ("' . $_POST['firstName'] . '","' . $_POST['lastName'] . '","' . $_POST['email'] . '","' . $_POST['departmentID'] . '")';
+				break;
+
+			case 'department':
+				# code...
+				break;
+			case 'location':
+				# code...
+				break;
+			default:
+				# code...
+				break;
+		}
+
+
+
+
+		break;
+
 	default:
 		exit('Invalid Database Query');
 		break;

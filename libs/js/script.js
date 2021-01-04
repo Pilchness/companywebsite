@@ -3,7 +3,33 @@ class DatabaseQuery {
     this.querytype = querytype;
   }
 
-  getData = async (search, param = 0) => {
+  createData = async (firstName, lastName, email, departmentID, table) => {
+    console.log(firstName, lastName, email, departmentID, table);
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        type: 'POST',
+        url: 'libs/php/databaseFunctions.php',
+        dataType: 'json',
+        data: {
+          operation: 'create',
+          querytype: this.querytype,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          departmentID: departmentID,
+          table: table
+        },
+        success: function (result) {
+          resolve(result);
+        },
+        error: function (error) {
+          reject(error);
+        }
+      });
+    });
+  };
+
+  readData = async (search, param = 0) => {
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -117,10 +143,15 @@ const locationDirectoryQuery = new DatabaseQuery('location');
 const idQuery = new DatabaseQuery('id');
 const personnelUpdate = new DatabaseQuery('update');
 const deletePersonnel = new DatabaseQuery('delete');
+const createNewStaffRecord = new DatabaseQuery('create');
+
+personnelDirectoryQuery.readData('all_personnel').then((response) => {
+  console.log(response);
+});
 
 const updateProfileDepartmentList = async (location = 'all', department) => {
   departmentDirectoryQuery
-    .getData(location, 'location')
+    .readData(location, 'location')
     .then((response) => {
       response.forEach((dept) => {
         if (dept.name !== department) {
@@ -140,7 +171,7 @@ const updateProfileDepartmentList = async (location = 'all', department) => {
 
 const createLocationDropdown = async (location) => {
   locationDirectoryQuery
-    .getData('all')
+    .readData('all')
     .then((response) => {
       response.forEach((loc) => {
         if (loc.name !== location) {
@@ -194,6 +225,20 @@ const handleEmailInput = (email) => {
   });
 };
 
+const addNewPersonToDatabase = async (
+  firstName,
+  lastName,
+  email,
+  department
+) => {
+  console.log(firstName, lastName, email, department);
+  createNewStaffRecord
+    .createData(firstName, lastName, email, department, 'personnel')
+    .then((response) => {
+      console.log(response);
+    });
+};
+
 const handleOnboardInput = () => {
   let first = 0;
   let last = 0;
@@ -230,6 +275,26 @@ const handleOnboardInput = () => {
     console.log(total);
     if (total === 7) {
       $('#new-onboard').removeAttr('disabled');
+      $('#new-onboard').on('click', function () {
+        addNewPersonToDatabase(
+          $('#onboard-first-name').val(),
+          $('#onboard-last-name').val(),
+          $('#onboard-email').val(),
+          $('#department-selector.add :selected').attr('value')
+        ).then((response) => {
+          console.log(response);
+          errorDisplay(
+            {
+              responseText: `Employee has been successfully added.`
+            },
+            'green'
+          );
+          $('#new-onboard').attr('disabled', true);
+          $('#onboard-first-name').val(''),
+            $('#onboard-last-name').val(''),
+            $('#onboard-email').val('');
+        });
+      });
     } else {
       $('#new-onboard').attr('disabled', true);
     }
@@ -255,7 +320,7 @@ const loadOnboardPage = () => {
       To add a new person to the database, complete their details below and then
       click the <strong>Add Employee</strong> button.
     </p>
-    <form>
+    <div>
       <div class="form-group">
         <label class="form-label" for="onboard-first-name">First Name</label>
         <input type="text" class="form-control" id="onboard-first-name" />
@@ -273,7 +338,7 @@ const loadOnboardPage = () => {
       <br>
       <select
       style="flex: 1; border-radius: 5px"
-      class="custom-select"
+      class="custom-select add"
       id="location-selector"
     ></select></div>
     <div>
@@ -281,7 +346,7 @@ const loadOnboardPage = () => {
     <br>
     <select
       style="flex: 1; border-radius: 5px"
-      class="custom-select"
+      class="custom-select add"
       id="department-selector"
     ></select>
     </div>
@@ -291,8 +356,8 @@ const loadOnboardPage = () => {
         >
         <input type="file" class="custom-file-input" id="headshot-photo" />
       </div>
-      <button style="float: right; margin-right: -30px" id="new-onboard" class="btn btn-success" type="submit" disabled>Add Employee</button>
-    </form>
+      <button style="float: right; margin-right: -30px" id="new-onboard" class="btn btn-success" disabled>Add Employee</button>
+    </div>
   </div></div>`
   );
   // $('#main-content').css('margin-top', '200px');
@@ -308,7 +373,7 @@ const loadOnboardPage = () => {
 const mainDirectory = async (search, department) => {
   $('#main-directory').empty();
   personnelDirectoryQuery
-    .getData(search, department)
+    .readData(search, department)
     .then((response) => {
       response.forEach((person) => {
         $('#main-directory')
@@ -332,7 +397,7 @@ const mainDirectory = async (search, department) => {
 };
 
 const departmentList = async () => {
-  departmentDirectoryQuery.getData('all').then((response) => {
+  departmentDirectoryQuery.readData('all').then((response) => {
     response.forEach((department) => {
       $('#department-list')
         .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
@@ -343,7 +408,7 @@ const departmentList = async () => {
         </div>
       </div>`);
       departmentDirectoryQuery
-        .getData(department.id, 'person')
+        .readData(department.id, 'person')
         .then((response) => {
           response.forEach((departmentMember) => {
             $(`#personnel-dept-${department.id}`).append(
@@ -364,7 +429,7 @@ const departmentList = async () => {
 
 const locationList = async () => {
   locationDirectoryQuery
-    .getData('all')
+    .readData('all')
     .then((response) => {
       response.forEach((location) => {
         $('#location-list')
@@ -376,7 +441,7 @@ const locationList = async () => {
         </div>
       </div>`);
         locationDirectoryQuery
-          .getData(location.id)
+          .readData(location.id)
           .then((response) => {
             response.forEach((locationMember) => {
               $(`#personnel-dept-${location.id}`).append(
@@ -398,7 +463,7 @@ const locationList = async () => {
 };
 
 const populateDepartmentSelector = () => {
-  departmentDirectoryQuery.getData('all').then((response) => {
+  departmentDirectoryQuery.readData('all').then((response) => {
     response.forEach((department) => {
       $('#department-search-select').append(
         `<option id="${department.id}">${shortenDepartmentString(
@@ -601,7 +666,7 @@ const offboardPerson = async (id, name) => {
 
 const showPersonFile = async (id) => {
   idQuery
-    .getData(id)
+    .readData(id)
     .then((response) => {
       let person = response[0];
       $('#main-content').html(
