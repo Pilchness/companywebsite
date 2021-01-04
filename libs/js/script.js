@@ -4,7 +4,6 @@ class DatabaseQuery {
   }
 
   createData = async (firstName, lastName, email, departmentID, table) => {
-    console.log(firstName, lastName, email, departmentID, table);
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -120,7 +119,6 @@ const scrollReset = () => {
 };
 
 const errorDisplay = (error, color = 'red') => {
-  console.log('displaying message' + error.responseText);
   $('#main-content-header').append(
     `<span id="error" style="color: ${color}">${error.responseText}</span>`
   );
@@ -145,10 +143,6 @@ const idQuery = new DatabaseQuery('id');
 const personnelUpdate = new DatabaseQuery('update');
 const deletePersonnel = new DatabaseQuery('delete');
 const createNewStaffRecord = new DatabaseQuery('create');
-
-personnelDirectoryQuery.readData('all_personnel').then((response) => {
-  console.log(response);
-});
 
 const updateProfileDepartmentList = async (location = 'all', department) => {
   departmentDirectoryQuery
@@ -232,7 +226,6 @@ const addNewPersonToDatabase = async (
   email,
   department
 ) => {
-  console.log(firstName, lastName, email, department);
   createNewStaffRecord
     .createData(firstName, lastName, email, department, 'personnel')
     .then((response) => {
@@ -245,35 +238,27 @@ const handleOnboardInput = () => {
   let last = 0;
   let email = 0;
   $('#onboard-first-name').on('keyup', function () {
-    console.log($(this).val());
     if (nameValidate.test($(this).val())) {
-      console.log('first name validated');
       first = 1;
     } else {
       first = 0;
     }
   });
   $('#onboard-last-name').on('keyup', function () {
-    console.log($(this).val());
     if (nameValidate.test($(this).val())) {
-      console.log('last name validated');
       last = 2;
     } else {
       last = 0;
     }
   });
   $('#onboard-email').on('keyup', function () {
-    console.log($(this).val());
     if (emailValidate.test($(this).val())) {
-      console.log('email validated');
       email = 4;
     } else {
-      console.log('not acceptable');
       email = 0;
     }
   });
   const validate = (total) => {
-    console.log(total);
     if (total === 7) {
       $('#new-onboard').removeAttr('disabled');
     } else {
