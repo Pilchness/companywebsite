@@ -1,37 +1,43 @@
-<div id="form-container">
-  <p class="body-text">
-    To add a new person to the database, complete their details below and then
-    click the add button.
-  </p>
-  <form>
-    <div class="form-group">
-      <label class="form-label" for="onboard-first-name">First Name</label>
-      <input type="text" class="form-control" id="onboard-first-name" />
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="onboard-last-name">Last Name</label>
-      <input type="text" class="form-control" id="onboard-last-name" />
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="onboard-email">Email</label>
-      <input type="email" class="form-control" id="onboard-email" />
-    </div>
-    <div class="custom-file">
-      <label class="custom-file-label form-label" for="headshot-photo"
-        >Upload headshot photo (max 100kb)</label
-      >
-      <input type="file" class="custom-file-input" id="headshot-photo" />
-    </div>
-    <select
-      style="flex: 1; border-radius: 5px"
-      class="custom-select"
-      id="location-selector"
-    ></select>
+<div id="page-content">
+  <div id="form-container">
+    <p class="body-text">
+      To add a new person to the database, complete their details below and then
+      click the <strong>Add Employee</strong> button.
+    </p>
+    <div>
 
-    <select
-      style="flex: 1; border-radius: 5px"
-      class="custom-select"
-      id="department-selector"
-    ></select>
-  </form>
+      <div class="form-group">
+        <label class="form-label" for="onboard-first-name">First Name</label>
+        <input type="text" class="form-control" id="onboard-first-name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="onboard-last-name">Last Name</label>
+        <input type="text" class="form-control" id="onboard-last-name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="onboard-email">Email</label>
+        <input type="email" class="form-control" id="onboard-email" />
+      </div>
+      <div>
+        <label class="form-label" for="location-selector">Location</label>
+        <br>
+        <select style="flex: 1; border-radius: 5px" class="custom-select add" id="location-selector"></select>
+      </div>
+      <div>
+        <label class="form-label" for="department-selector">Department</label>
+        <br>
+        <select style="flex: 1; border-radius: 5px" class="custom-select add" id="department-selector"></select>
+      </div>
+
+      <form method="post" action="" enctype="multipart/form-data" id="myform">
+        <div class="custom-file">
+          <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
+          <input type="file" class="custom-file-input" id="file" name="file" />
+        </div>
+        <button style="float: right; margin-right: -30px" id="new-onboard" value="Upload" class="btn btn-success button"
+          disabled>Add Employee</button>
+    </div>
+    </form>
+  </div>
+</div>
 </div>

@@ -163,9 +163,17 @@ switch ($_POST['querytype']) {
 		switch ($_POST['table']) {
 			case 'personnel':
 
-				$query = 'INSERT INTO personnel (firstName, lastName, email, departmentID) 
-				VALUES ("' . $_POST['firstName'] . '","' . $_POST['lastName'] . '","' . $_POST['email'] . '","' . $_POST['departmentID'] . '")';
+				// $nextID = $conn->query('SELECT MAX(id) FROM personnel');
+				// echo (json_encode($nextID));
+				$jobTitle = "";
+
+				$query = 'INSERT INTO personnel (firstName, lastName, jobTitle, email, departmentID, id) 
+				SELECT "' . $_POST['firstName'] . '","' . $_POST['lastName'] . '","' . $jobTitle . '","' . $_POST['email'] . '","' . $_POST['departmentID'] .
+					'", MAX(id) + 1 FROM personnel';
 				break;
+
+				// $query = 'SELECT MAX(id) FROM personnel';
+				// break;
 
 			case 'department':
 				# code...

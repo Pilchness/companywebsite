@@ -120,6 +120,7 @@ const scrollReset = () => {
 };
 
 const errorDisplay = (error, color = 'red') => {
+  console.log('displaying message' + error.responseText);
   $('#main-content-header').append(
     `<span id="error" style="color: ${color}">${error.responseText}</span>`
   );
@@ -275,26 +276,6 @@ const handleOnboardInput = () => {
     console.log(total);
     if (total === 7) {
       $('#new-onboard').removeAttr('disabled');
-      $('#new-onboard').on('click', function () {
-        addNewPersonToDatabase(
-          $('#onboard-first-name').val(),
-          $('#onboard-last-name').val(),
-          $('#onboard-email').val(),
-          $('#department-selector.add :selected').attr('value')
-        ).then((response) => {
-          console.log(response);
-          errorDisplay(
-            {
-              responseText: `Employee has been successfully added.`
-            },
-            'green'
-          );
-          $('#new-onboard').attr('disabled', true);
-          $('#onboard-first-name').val(''),
-            $('#onboard-last-name').val(''),
-            $('#onboard-email').val('');
-        });
-      });
     } else {
       $('#new-onboard').attr('disabled', true);
     }
@@ -312,61 +293,110 @@ const loadReportsPage = () => {
   console.log('loading reports');
 };
 
+const addNewPersonPhoto = (id) => {
+  $('#new-onboard').click(function (e) {
+    e.preventDefault();
+    var fd = new FormData();
+    var files = $('#file')[0].files;
+    if (files.length > 0) {
+      fd.append('file', files[0]);
+
+      $.ajax({
+        url: 'libs/php/upload.php',
+        type: 'post',
+        data: fd,
+        fileName: `staffphoto_id${id}`,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+          console.log(response);
+        },
+        error: function (error) {
+          console.log(error);
+        }
+      });
+    } else {
+      alert('Please select a file.');
+    }
+  });
+};
+
 const loadOnboardPage = () => {
   $('#main-content').replaceWith(
     `<div id="page-content">
     <div id="form-container">
-    <p class="body-text">
-      To add a new person to the database, complete their details below and then
-      click the <strong>Add Employee</strong> button.
-    </p>
-    <div>
-      <div class="form-group">
-        <label class="form-label" for="onboard-first-name">First Name</label>
-        <input type="text" class="form-control" id="onboard-first-name" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="onboard-last-name">Last Name</label>
-        <input type="text" class="form-control" id="onboard-last-name" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="onboard-email">Email</label>
-        <input type="email" class="form-control" id="onboard-email" />
-      </div>
+      <p class="body-text">
+        To add a new person to the database, complete their details below and then
+        click the <strong>Add Employee</strong> button.
+      </p>
       <div>
-      <label class="form-label" for="location-selector">Location</label>
-      <br>
-      <select
-      style="flex: 1; border-radius: 5px"
-      class="custom-select add"
-      id="location-selector"
-    ></select></div>
-    <div>
-    <label class="form-label" for="department-selector">Department</label>
-    <br>
-    <select
-      style="flex: 1; border-radius: 5px"
-      class="custom-select add"
-      id="department-selector"
-    ></select>
-    </div>
-      <div class="custom-file">
-        <label class="custom-file-label form-label" for="headshot-photo"
-          >Upload headshot photo (max 100kb)</label
-        >
-        <input type="file" class="custom-file-input" id="headshot-photo" />
+  
+        <div class="form-group">
+          <label class="form-label" for="onboard-first-name">First Name</label>
+          <input type="text" class="form-control" id="onboard-first-name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="onboard-last-name">Last Name</label>
+          <input type="text" class="form-control" id="onboard-last-name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="onboard-email">Email</label>
+          <input type="email" class="form-control" id="onboard-email" />
+        </div>
+        <div>
+          <label class="form-label" for="location-selector">Location</label>
+          <br>
+          <select style="flex: 1; border-radius: 5px" class="custom-select add" id="location-selector"></select>
+        </div>
+        <div>
+          <label class="form-label" for="department-selector">Department</label>
+          <br>
+          <select style="flex: 1; border-radius: 5px" class="custom-select add" id="department-selector"></select>
+        </div>
+  
+        <form method="post" action="" enctype="multipart/form-data" id="myform">
+          <div class="custom-file">
+            <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
+            <input type="file" class="custom-file-input" id="file" name="file" />
+          </div>
+          <button style="float: right; margin-right: -30px" id="new-onboard" value="Upload" class="btn btn-success button"
+            disabled>Add Employee</button>
       </div>
-      <button style="float: right; margin-right: -30px" id="new-onboard" class="btn btn-success" disabled>Add Employee</button>
+      </form>
     </div>
-  </div></div>`
+  </div>
+  </div>`
   );
   // $('#main-content').css('margin-top', '200px');
   // $('#main-content').css('overflow', 'hidden');
   // $('main').css('overflow', 'hidden');
   createLocationDropdown();
-  updateProfileDepartmentList();
+  updateProfileDepartmentList(1, 1);
   updateLocationAndDepartmentSelectors();
   handleOnboardInput();
+
+  $('#new-onboard').on('click', function (e) {
+    e.preventDefault();
+    addNewPersonToDatabase(
+      $('#onboard-first-name').val(),
+      $('#onboard-last-name').val(),
+      $('#onboard-email').val(),
+      $('#department-selector.add :selected').attr('value')
+    ).then((response) => {
+      addNewPersonPhoto(response.id);
+      console.log(response.id);
+      errorDisplay(
+        {
+          responseText: `Employee has been successfully added.`
+        },
+        'green'
+      );
+      $('#new-onboard').attr('disabled', true);
+      $('#onboard-first-name').val(''),
+        $('#onboard-last-name').val(''),
+        $('#onboard-email').val('');
+    });
+  });
   scrollReset();
 };
 
