@@ -106,6 +106,12 @@ class DatabaseQuery {
 let visibleSearch = false;
 let marginTop = ['162px', '198px'];
 
+const toggleScroll = (scrollEnable) => {
+  scrollEnable
+    ? $('html, body').css('overflow-y', '')
+    : $('html, body').css('overflow-y', 'hidden');
+};
+
 const scrollReset = () => {
   if ($('#main-content').length) {
     document.getElementById('main-content').scrollIntoView();
@@ -118,7 +124,7 @@ const scrollReset = () => {
   }
 };
 
-const errorDisplay = (error, color = 'red') => {
+const messageDisplay = (error, color = 'red') => {
   $('#main-content-header').append(
     `<span id="error" style="color: ${color}">${error.responseText}</span>`
   );
@@ -160,7 +166,7 @@ const updateProfileDepartmentList = async (location = 'all', department) => {
       });
     })
     .catch((error) => {
-      errorDisplay(error);
+      messageDisplay(error);
     });
 };
 
@@ -177,7 +183,7 @@ const createLocationDropdown = async (location) => {
       });
     })
     .catch((error) => {
-      errorDisplay(error);
+      messageDisplay(error);
     });
 };
 
@@ -271,14 +277,66 @@ const handleOnboardInput = () => {
 };
 
 const loadDashboard = () => {
-  console.log('loading dashboard');
+  const notificationArray = [
+    {
+      title: 'Welcome',
+      message:
+        'Welcome to the Global Unity Personnel App, the best way to access the personnel database and keep up to date with everything that is happening.'
+    },
+    {
+      title: 'New Employees',
+      message: 'Please welcome three new members of the sales team. '
+    },
+    {
+      title: 'Photo Reminder',
+      message:
+        'Would all users of the app please check if they have a recent up to date photo on their profile and update it if necessary.'
+    },
+    {
+      title: 'New App Feature',
+      message:
+        'Try the new reports section for fascinating insights into our organization. '
+    },
+    {
+      title: "Senior Directors' Meeting",
+      message:
+        'The Senior Directors will meet as usual on the 1st Friday in the month, but due to COVID the meeting this month will be via Zoom.'
+    },
+    {
+      title: 'Christmas Draw Winner',
+      message:
+        'Congratulations to Tamarra Ace who came first in the Christmas Draw and is the lucky winner of a tin of biscuits.',
+      image: 'images/staffpics/staffphoto_id22.jpg'
+    }
+  ];
+  $('#main-content').replaceWith(
+    `<div id="page-content">
+    <ul></ul>
+    </div>`
+  );
+  let messageIndex = 0;
+  notificationArray.forEach((message) => {
+    $('#page-content').append(`
+    <div id="message-card${messageIndex}" class="card message-card border-dark mb-1" style="max-width: 100%">
+        <div class="card-header">${message.title}</div>
+        <div class="card-body text-dark">
+          <p class="message-text">${message.message}</p>
+          <img id="messageImage${messageIndex}" width="50px" height="50px" style="visibility: hidden" src="${message.image}">
+        </div>
+      </div>
+    `);
+    if (message.image) {
+      $(`#messageImage${messageIndex}`).css('visibility', 'visible');
+    }
+    messageIndex++;
+  });
 };
 
 const loadReportsPage = () => {
   console.log('loading reports');
 };
 
-addNewPersonPhoto = () => {
+const addNewPersonPhoto = () => {
   $('#new-onboard').click(function () {
     var fd = new FormData();
     var files = $('#file')[0].files;
@@ -355,9 +413,6 @@ const loadOnboardPage = () => {
 </div>
 </div>`
   );
-  // $('#main-content').css('margin-top', '200px');
-  // $('#main-content').css('overflow', 'hidden');
-  // $('main').css('overflow', 'hidden');
   createLocationDropdown();
   updateProfileDepartmentList(1, 1);
   updateLocationAndDepartmentSelectors();
@@ -370,7 +425,7 @@ const loadOnboardPage = () => {
       $('#onboard-email').val(),
       $('#department-selector.add :selected').attr('value')
     ).then(() => {
-      errorDisplay(
+      messageDisplay(
         {
           responseText: `Employee has been successfully added.`
         },
@@ -407,7 +462,7 @@ const mainDirectory = async (search, department) => {
       scrollReset();
     })
     .catch((error) => {
-      errorDisplay(error);
+      messageDisplay(error);
     });
 };
 
@@ -436,7 +491,7 @@ const departmentList = async () => {
           scrollReset();
         })
         .catch((error) => {
-          errorDisplay(error);
+          messageDisplay(error);
         });
     });
   });
@@ -468,12 +523,12 @@ const locationList = async () => {
             scrollReset();
           })
           .catch((error) => {
-            errorDisplay(error);
+            messageDisplay(error);
           });
       });
     })
     .catch((error) => {
-      errorDisplay(error);
+      messageDisplay(error);
     });
 };
 
@@ -552,10 +607,10 @@ const updatePersonRecord = async (id, department, email) => {
   personnelUpdate
     .updateData(id, email, department)
     .then(() => {
-      errorDisplay({ responseText: `Database Update Success` }, 'green');
+      messageDisplay({ responseText: `Database Update Success` }, 'green');
     })
     .catch((error) => {
-      errorDisplay(error);
+      messageDisplay(error);
     });
 };
 
@@ -661,7 +716,7 @@ const offboardPerson = async (id, name) => {
     deletePersonnel
       .deleteData('id', id)
       .then(() => {
-        errorDisplay(
+        messageDisplay(
           {
             responseText: `${name} has been successfully removed from the database.`
           },
@@ -669,13 +724,13 @@ const offboardPerson = async (id, name) => {
         );
       })
       .catch((error) => {
-        errorDisplay(error);
+        messageDisplay(error);
       });
   });
   $('#cancel-delete-person').on('click', function (e) {
     $('#delete-person-warning').remove();
     e.stopPropagation();
-    errorDisplay({ responseText: `${name} has NOT been deleted.` }, 'green');
+    messageDisplay({ responseText: `${name} has NOT been deleted.` }, 'green');
   });
 };
 
@@ -738,25 +793,30 @@ const showPersonFile = async (id) => {
       scrollReset();
     })
     .catch((error) => {
-      errorDisplay(error);
+      messageDisplay(error);
     });
 };
 
 const loadPage = (pageId) => {
   switch (pageId) {
     case 'dashboard':
+      toggleScroll(true);
       loadDashboard();
       break;
     case 'personnel':
+      toggleScroll(true);
       loadPersonnelPage();
       break;
     case 'reports':
+      toggleScroll(false);
       loadReportsPage();
       break;
     case 'onboard':
+      toggleScroll(false);
       loadOnboardPage();
       break;
     default:
+      toggleScroll(true);
       loadDashboard();
   }
 };
@@ -772,4 +832,5 @@ $(document).ready(function () {
   $(document).on('click', '.headshot', function () {
     showPersonFile($(this).attr('id'));
   });
+  loadDashboard();
 });
