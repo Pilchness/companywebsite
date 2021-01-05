@@ -133,6 +133,14 @@ const messageDisplay = (error, color = 'red') => {
   });
 };
 
+const changePageLayout = (changeTo) => {
+  $('#main-content').length ? (changeFrom = 'main') : (changeFrom = 'page');
+  $(`#${changeFrom}-content`).replaceWith(
+    `<div id="${changeTo}-content"></div>`
+  );
+  scrollReset();
+};
+
 const shortenDepartmentString = (departmentName, max) => {
   let departmentTextString = departmentName;
   let maxLength = max;
@@ -277,46 +285,54 @@ const handleOnboardInput = () => {
 };
 
 const loadDashboard = () => {
+  changePageLayout('main');
   const notificationArray = [
     {
       title: 'Welcome',
       message:
-        'Welcome to the Global Unity Personnel App, the best way to access the personnel database and keep up to date with everything that is happening.'
+        'Welcome to the Global Unity Personnel App, the best way to access the personnel database and keep up to date with everything.',
+      image: 'images/icons/welcome.png'
     },
     {
       title: 'New Employees',
-      message: 'Please welcome three new members of the sales team. '
+      message: 'Please welcome three new members of the sales team.',
+      image: 'images/icons/team.png'
     },
     {
       title: 'Photo Reminder',
       message:
-        'Would all users of the app please check if they have a recent up to date photo on their profile and update it if necessary.'
+        'Would all users of the app please check if they have a recent up to date photo on their profile and update it if necessary.',
+      image: 'images/icons/think.png'
     },
     {
       title: 'New App Feature',
       message:
-        'Try the new reports section for fascinating insights into our organization. '
+        'Try the new reports section for fascinating insights into our organization.',
+      image: 'images/icons/report.png',
+      action: `toggleScroll(false);loadReportsPage();$('#page-title').text("Try our new Reports feature!");`
     },
     {
       title: "Senior Directors' Meeting",
       message:
-        'The Senior Directors will meet as usual on the 1st Friday in the month, but due to COVID the meeting this month will be via Zoom.'
+        'The Senior Directors will meet as usual on the 1st Friday in the month, but due to COVID the meeting this month will be via Zoom.',
+      image: 'images/icons/manage.png'
     },
     {
       title: 'Christmas Draw Winner',
       message:
         'Congratulations to Tamarra Ace who came first in the Christmas Draw and is the lucky winner of a tin of biscuits.',
-      image: 'images/staffpics/staffphoto_id22.jpg'
+      image: 'images/staffpics/staffphoto_id23.jpg',
+      action: `showPersonFile(23); $('#page-title').text("Well done, Tamarra!");`
     }
   ];
   $('#main-content').replaceWith(
     `<div id="page-content">
-    <ul></ul>
+    <ul id="message-list"></ul>
     </div>`
   );
   let messageIndex = 0;
   notificationArray.forEach((message) => {
-    $('#page-content').append(`
+    $('#message-list').append(`
     <div id="message-card${messageIndex}" class="card message-card border-dark mb-1" style="max-width: 100%">
         <div class="card-header">${message.title}</div>
         <div class="card-body text-dark">
@@ -328,12 +344,18 @@ const loadDashboard = () => {
     if (message.image) {
       $(`#messageImage${messageIndex}`).css('visibility', 'visible');
     }
+    if (message.action) {
+      $(`#message-card${messageIndex}`).on('click', function () {
+        eval(message.action);
+      });
+    }
     messageIndex++;
   });
 };
 
 const loadReportsPage = () => {
-  console.log('loading reports');
+  scrollReset();
+  changePageLayout('page');
 };
 
 const addNewPersonPhoto = () => {
@@ -368,7 +390,8 @@ const addNewPersonPhoto = () => {
 };
 
 const loadOnboardPage = () => {
-  $('#main-content').replaceWith(
+  changePageLayout('page');
+  $('#page-content').append(
     `<div id="page-content">
   <div id="form-container">
     <p class="body-text">
@@ -615,9 +638,7 @@ const updatePersonRecord = async (id, department, email) => {
 };
 
 const loadPersonnelPage = () => {
-  if ($('#page-content').length) {
-    $('#page-content').replaceWith(`<div id="main-content"></div>`);
-  }
+  changePageLayout('main');
   if (!$('#personnel-button-container').length) {
     $('#main-content-header').append(`
       <div id="personnel-button-container" class="nav nav-tabs">
@@ -735,6 +756,10 @@ const offboardPerson = async (id, name) => {
 };
 
 const showPersonFile = async (id) => {
+  if (!$('#main-content').length) {
+    loadPersonnelPage();
+    toggleScroll();
+  }
   idQuery
     .readData(id)
     .then((response) => {
