@@ -239,7 +239,11 @@ if ($_POST['operation'] == 'read') {
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 	//echo (mysqli_fetch_assoc($newID));
-	rename("../../images/uploads/staffphoto_temp.jpg", "../../images/staffpics/staffphoto_id" . $lastID . ".jpg");
+	if ($_POST['placeholder'] == 'true') {
+		copy("../../images/icons/placeholder.jpg", "../../images/staffpics/staffphoto_id" . $lastID . ".jpg");
+	} else {
+		rename("../../images/uploads/staffphoto_temp.jpg", "../../images/staffpics/staffphoto_id" . $lastID . ".jpg");
+	}
 }
 
 mysqli_close($conn);

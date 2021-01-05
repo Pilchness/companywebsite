@@ -3,7 +3,15 @@ class DatabaseQuery {
     this.querytype = querytype;
   }
 
-  createData = async (firstName, lastName, email, departmentID, table) => {
+  createData = async (
+    firstName,
+    lastName,
+    email,
+    departmentID,
+    placeholder,
+    table
+  ) => {
+    console.log(placeholder);
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -16,6 +24,7 @@ class DatabaseQuery {
           lastName: lastName,
           email: email,
           departmentID: departmentID,
+          placeholder: placeholder,
           table: table
         },
         success: function (result) {
@@ -238,10 +247,18 @@ const addNewPersonToDatabase = async (
   firstName,
   lastName,
   email,
-  department
+  department,
+  placeholder
 ) => {
   createNewStaffRecord
-    .createData(firstName, lastName, email, department, 'personnel')
+    .createData(
+      firstName,
+      lastName,
+      email,
+      department,
+      placeholder,
+      'personnel'
+    )
     .then((response) => {
       console.log(response);
     });
@@ -286,71 +303,65 @@ const handleOnboardInput = () => {
 
 const loadDashboard = () => {
   changePageLayout('main');
-  const notificationArray = [
-    {
-      title: 'Welcome',
-      message:
-        'Welcome to the Global Unity Personnel App, the best way to access the personnel database and keep up to date with everything.',
-      image: 'images/icons/welcome.png'
-    },
-    {
-      title: 'New Employees',
-      message: 'Please welcome three new members of the sales team.',
-      image: 'images/icons/team.png'
-    },
-    {
-      title: 'Photo Reminder',
-      message:
-        'Would all users of the app please check if they have a recent up to date photo on their profile and update it if necessary.',
-      image: 'images/icons/think.png'
-    },
-    {
-      title: 'New App Feature',
-      message:
-        'Try the new reports section for fascinating insights into our organization.',
-      image: 'images/icons/report.png',
-      action: `toggleScroll(false);loadReportsPage();$('#page-title').text("Try our new Reports feature!");`
-    },
-    {
-      title: "Senior Directors' Meeting",
-      message:
-        'The Senior Directors will meet as usual on the 1st Friday in the month, but due to COVID the meeting this month will be via Zoom.',
-      image: 'images/icons/manage.png'
-    },
-    {
-      title: 'Christmas Draw Winner',
-      message:
-        'Congratulations to Tamarra Ace who came first in the Christmas Draw and is the lucky winner of a tin of biscuits.',
-      image: 'images/staffpics/staffphoto_id23.jpg',
-      action: `showPersonFile(23); $('#page-title').text("Well done, Tamarra!");`
-    }
-  ];
+
   $('#main-content').replaceWith(
     `<div id="page-content">
     <ul id="message-list"></ul>
     </div>`
   );
+
   let messageIndex = 0;
-  notificationArray.forEach((message) => {
-    $('#message-list').append(`
-    <div id="message-card${messageIndex}" class="card message-card border-dark mb-1" style="max-width: 100%">
-        <div class="card-header">${message.title}</div>
-        <div class="card-body text-dark">
-          <p class="message-text">${message.message}</p>
-          <img id="messageImage${messageIndex}" width="50px" height="50px" style="visibility: hidden" src="${message.image}">
-        </div>
-      </div>
+  const updateMessages = () => {
+    notificationArray.forEach((message) => {
+      $('#message-list').append(`
+    <div
+    id="message-card${messageIndex}"
+    class="card message-card border-dark mb-1"
+    style="max-width: 100%"
+  >
+    <div class="card-header">
+      ${message.title}
+      <button
+        type="button"
+        id="message-close${messageIndex}"
+        class="btn-close message-close"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="card-body text-dark" id="message-body${messageIndex}">
+      <p class="message-text">
+        <img
+          id="message-image${messageIndex}"
+          class="message-image"
+          width="auto"
+          height="50px"
+          src="${message.image}"
+        />${message.message}
+      </p>
+    </div>
+  </div>
     `);
-    if (message.image) {
-      $(`#messageImage${messageIndex}`).css('visibility', 'visible');
-    }
-    if (message.action) {
-      $(`#message-card${messageIndex}`).on('click', function () {
-        eval(message.action);
+      if (message.image) {
+        $(`#message-image${messageIndex}`).css('visibility', 'visible');
+      }
+      if (message.action) {
+        $(`#message-image${messageIndex}`).on('click', function () {
+          eval(message.action);
+        });
+      }
+      $(`#message-close${messageIndex}`).on('click', function () {
+        const index = messageIndex;
+        console.log(index);
+        console.table(notificationArray);
+        notificationArray = notificationArray
+          .slice(0, index - 1)
+          .concat(notificationArray.slice(index, notificationArray.length));
+        loadDashboard();
       });
-    }
-    messageIndex++;
-  });
+      messageIndex++;
+    });
+  };
+  updateMessages();
 };
 
 const loadReportsPage = () => {
@@ -358,18 +369,20 @@ const loadReportsPage = () => {
   changePageLayout('page');
 };
 
+let placeholder = 'false';
+
 const addNewPersonPhoto = () => {
   $('#new-onboard').click(function () {
-    var fd = new FormData();
-    var files = $('#file')[0].files;
-
+    let fd = new FormData();
+    let files = $('#file')[0].files;
+    console.log(files);
+    // if(files.length <=0) {files = }
     // Check file selected or not
     if (files.length > 0) {
       fd.append('file', files[0]);
-
       $.ajax({
         url: 'libs/php/upload.php',
-        type: 'post',
+        type: 'POST',
         data: fd,
         contentType: false,
         processData: false,
@@ -379,12 +392,12 @@ const addNewPersonPhoto = () => {
             //$('#img').attr('src', response);
             //$('.preview img').show(); // Display image element
           } else {
-            alert('file not uploaded');
+            placeholder = 'true';
           }
         }
       });
     } else {
-      alert('Please select a file.');
+      placeholder = 'true';
     }
   });
 };
@@ -446,7 +459,8 @@ const loadOnboardPage = () => {
       $('#onboard-first-name').val(),
       $('#onboard-last-name').val(),
       $('#onboard-email').val(),
-      $('#department-selector.add :selected').attr('value')
+      $('#department-selector.add :selected').attr('value'),
+      placeholder
     ).then(() => {
       messageDisplay(
         {
@@ -470,9 +484,9 @@ const mainDirectory = async (search, department) => {
     .then((response) => {
       response.forEach((person) => {
         $('#main-directory')
-          .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
+          .append(`<div class="card directory-card border-dark mb-1" style="max-width: 100%;">
         <div class="card-header">${person.firstName} ${person.lastName}</div>
-        <div class="card-body text-dark">
+        <div class="card-body directory-card-body text-dark">
         <img class="headshot" id="${person.id}" src='images/staffpics/staffphoto_id${person.id}.jpg' width='50px' height='50px'/>
           <ul style="margin-left: 5px; margin-top: 5px">
           <li class="person-card-text"><b>Dept:</b> ${person.department}</li>
@@ -639,6 +653,7 @@ const updatePersonRecord = async (id, department, email) => {
 
 const loadPersonnelPage = () => {
   changePageLayout('main');
+  toggleScroll(true);
   if (!$('#personnel-button-container').length) {
     $('#main-content-header').append(`
       <div id="personnel-button-container" class="nav nav-tabs">
@@ -758,7 +773,6 @@ const offboardPerson = async (id, name) => {
 const showPersonFile = async (id) => {
   if (!$('#main-content').length) {
     loadPersonnelPage();
-    toggleScroll();
   }
   idQuery
     .readData(id)
@@ -829,7 +843,6 @@ const loadPage = (pageId) => {
       loadDashboard();
       break;
     case 'personnel':
-      toggleScroll(true);
       loadPersonnelPage();
       break;
     case 'reports':
@@ -859,3 +872,45 @@ $(document).ready(function () {
   });
   loadDashboard();
 });
+
+let notificationArray = [
+  {
+    title: 'Welcome',
+    message:
+      'Welcome to the Global Unity Personnel App, the best way to access the personnel database and keep up to date with everything.',
+    image: 'images/icons/welcome.png'
+  },
+  {
+    title: 'New Employees',
+    message:
+      'Please welcome three new members of the sales team: Virge Bootes, Robena Ivanyutin and Brendan Fooks',
+    image: 'images/icons/team.png',
+    action: `loadPersonnelPage(); departmentList();`
+  },
+  {
+    title: 'Photo Reminder',
+    message:
+      'Would all users of the app please check if they have a recent up to date photo on their profile and update it if necessary.',
+    image: 'images/icons/think.png'
+  },
+  {
+    title: 'New App Feature',
+    message:
+      'Try the new reports section for fascinating insights into our organization.',
+    image: 'images/icons/report.png',
+    action: `toggleScroll(false);loadReportsPage();$('#page-title').text("Try our new Reports feature!");`
+  },
+  {
+    title: "Senior Directors' Meeting",
+    message:
+      'The Senior Directors will meet as usual on the 1st Friday in the month, but due to COVID the meeting this month will be via Zoom.',
+    image: 'images/icons/manage.png'
+  },
+  {
+    title: 'Christmas Draw Winner',
+    message:
+      'Congratulations to Tamarra Ace who came first in the Christmas Draw and is the lucky winner of a tin of biscuits and a chocolate cake.',
+    image: 'images/staffpics/staffphoto_id23.jpg',
+    action: `showPersonFile(23); $('#page-title').text("Well done, Tamarra!");`
+  }
+];
