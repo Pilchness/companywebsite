@@ -134,12 +134,15 @@ const scrollReset = () => {
 };
 
 const messageDisplay = (error, color = 'red') => {
-  $('#main-content-header').append(
-    `<span id="error" style="color: ${color}">${error.responseText}</span>`
-  );
-  $(document).on('click', function () {
-    $('#error').remove();
-  });
+  console.log(error, color);
+  if ($('#main-content-header').length) {
+    $('#main-content-header').append(
+      `<span id="error" style="color: ${color}">${error.responseText}</span>`
+    );
+    $(document).on('click', function () {
+      $('#error').remove();
+    });
+  }
 };
 
 const changePageLayout = (changeTo) => {
@@ -183,7 +186,12 @@ const updateProfileDepartmentList = async (location = 'all', department) => {
       });
     })
     .catch((error) => {
-      messageDisplay(error);
+      messageDisplay(
+        {
+          responseText: error
+        },
+        'red'
+      );
     });
 };
 
@@ -200,7 +208,12 @@ const createLocationDropdown = async (location) => {
       });
     })
     .catch((error) => {
-      messageDisplay(error);
+      messageDisplay(
+        {
+          responseText: error
+        },
+        'red'
+      );
     });
 };
 
@@ -303,6 +316,8 @@ const handleOnboardInput = () => {
 
 const loadDashboard = () => {
   changePageLayout('main');
+  toggleScroll(true);
+  scrollReset();
 
   $('#main-content').replaceWith(
     `<div id="page-content">
@@ -362,6 +377,11 @@ const loadDashboard = () => {
     });
   };
   updateMessages();
+  // if (isInt(parseInt(window.name))) {
+  //   //console.log(typeof window.name);
+  //   showPersonFile(parseInt(window.name));
+  //   window.name = null;
+  // } else console.log(window.name);
 };
 
 const loadReportsPage = () => {
@@ -370,6 +390,7 @@ const loadReportsPage = () => {
 };
 
 let placeholder = 'false';
+let uploadPhoto;
 
 const addNewPhoto = (id) => {
   $('#new-onboard, #confirm-changes').click(function () {
@@ -391,9 +412,20 @@ const addNewPhoto = (id) => {
         processData: false,
         success: function (response) {
           if (response != 0) {
-            //$('#card-img-top').attr('src', `images/staffphoto_id${id}.jpg`);
-            window.name = id;
-            location.reload();
+            // clearCache = function (reloadAfterClear = true) {
+            //   if ('caches' in window) {
+            //     caches.keys().then((names) => {
+            //       names.forEach(async (name) => {
+            //         await caches.delete(name);
+            //       });
+            //     });
+            //     if (reloadAfterClear) window.location.reload();
+            //   }
+            // };
+            // clearCache();
+            //console.log($('.custom-file-input').attr('name'));
+            // window.name = id;
+            //location.reload();
             //loadPersonnelPage();
           } else {
             placeholder = 'true';
@@ -505,7 +537,12 @@ const mainDirectory = async (search, department) => {
       scrollReset();
     })
     .catch((error) => {
-      messageDisplay(error);
+      messageDisplay(
+        {
+          responseText: error
+        },
+        'red'
+      );
     });
 };
 
@@ -534,7 +571,12 @@ const departmentList = async () => {
           scrollReset();
         })
         .catch((error) => {
-          messageDisplay(error);
+          messageDisplay(
+            {
+              responseText: error
+            },
+            'red'
+          );
         });
     });
   });
@@ -566,12 +608,22 @@ const locationList = async () => {
             scrollReset();
           })
           .catch((error) => {
-            messageDisplay(error);
+            messageDisplay(
+              {
+                responseText: error
+              },
+              'red'
+            );
           });
       });
     })
     .catch((error) => {
-      messageDisplay(error);
+      messageDisplay(
+        {
+          responseText: error
+        },
+        'red'
+      );
     });
 };
 
@@ -655,7 +707,12 @@ const updatePersonRecord = async (id, email, department) => {
       messageDisplay({ responseText: `Database Update Success` }, 'green');
     })
     .catch((error) => {
-      messageDisplay(error);
+      messageDisplay(
+        {
+          responseText: error
+        },
+        'red'
+      );
     });
 };
 
@@ -755,6 +812,27 @@ const editPerson = async (id, location, department, email, locid) => {
 </div>
   </div>
   </form></li>`);
+
+  $('#file').change(function () {
+    uploadPhoto = window.URL.createObjectURL(this.files[0]);
+    console.log(this.files[0].type);
+    if (this.files[0].type === 'image/jpeg') {
+      console.log('correct file type', this.files[0].type);
+      $('#confirm-changes').removeAttr('disabled');
+      $('.card-img-top').attr('src', uploadPhoto);
+    } else {
+      if (this.files[0].type !== 'image/jpeg') {
+        $('#confirm-changes').attr('disabled', true);
+        console.log('wrong file type', this.files[0].type);
+        messageDisplay(
+          {
+            responseText: 'Wrong type of file'
+          },
+          'red'
+        );
+      }
+    }
+  });
   handleEmailInput(email);
   addNewPhoto(id);
 };
@@ -786,7 +864,12 @@ const offboardPerson = async (id, name) => {
         );
       })
       .catch((error) => {
-        messageDisplay(error);
+        messageDisplay(
+          {
+            responseText: error
+          },
+          'red'
+        );
       });
   });
   $('#cancel-delete-person').on('click', function (e) {
@@ -828,6 +911,13 @@ const showPersonFile = async (id) => {
       </div>
     </div>`
       );
+      if (uploadPhoto) {
+        $('.card-img-top').attr('src', uploadPhoto);
+        $('body').on('click', function () {
+          location.reload();
+        });
+      }
+      uploadPhoto = null;
       $('.edit').on('click', function () {
         editPerson(
           $(this).attr('id'),
@@ -861,7 +951,12 @@ const showPersonFile = async (id) => {
       scrollReset();
     })
     .catch((error) => {
-      messageDisplay(error);
+      messageDisplay(
+        {
+          responseText: error
+        },
+        'red'
+      );
     });
 };
 
@@ -909,12 +1004,6 @@ function isInt(value) {
       return (x | 0) === x;
     })(parseFloat(value))
   );
-}
-
-if (isInt(window.name)) {
-  console.log(window.name);
-  messageDisplay('Profile has been updated successfully', 'blue');
-  window.name = null;
 }
 
 let notificationArray = [
