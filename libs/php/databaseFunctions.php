@@ -109,14 +109,39 @@ switch ($_POST['querytype']) {
 
 	case 'update':
 
-		if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) && $_POST['department'] !== '0') {
-			$query = 'UPDATE personnel
-					SET email = "' . $_POST['email'] . '",
-					departmentID = "' . $_POST['department'] . '"
-					WHERE id = "' . $_POST['id'] . '"';
+		if ($_POST['department'] == '0') {
+			if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+				$query = 'UPDATE personnel
+				SET email = "' . $_POST['email'] . '"
+				WHERE id = "' . $_POST['id'] . '"';
+			} else {
+				exit('Invalid Email Error');
+			}
 		} else {
-			exit('Invalid Email Error');
+			if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+				$query = 'UPDATE personnel
+				SET email = "' . $_POST['email'] . '",
+				departmentID = "' . $_POST['department'] . '"
+				WHERE id = "' . $_POST['id'] . '"';
+			} else {
+				exit('Invalid Email Error');
+			}
 		}
+
+		// if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) && $_POST['department'] !== '0') {
+		// 	$query = 'UPDATE personnel
+		// 			SET email = "' . $_POST['email'] . '",
+		// 			departmentID = "' . $_POST['department'] . '"
+		// 			WHERE id = "' . $_POST['id'] . '"';
+		// } else if (
+		// 	filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)
+		// ) {
+		// 	$query = 'UPDATE personnel
+		// 	SET email = "' . $_POST['email'] . '",
+		// 	WHERE id = "' . $_POST['id'] . '"';
+		// } else {
+		// 	exit('Invalid Email Error');
+		// }
 
 		break;
 
@@ -239,10 +264,21 @@ if ($_POST['operation'] == 'read') {
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 	//echo (mysqli_fetch_assoc($newID));
-	if ($_POST['placeholder'] == 'true') {
+
+	if ($_POST['operation'] == 'create') {
 		copy("../../images/icons/placeholder.jpg", "../../images/staffpics/staffphoto_id" . $lastID . ".jpg");
-	} else {
-		rename("../../images/uploads/staffphoto_temp.jpg", "../../images/staffpics/staffphoto_id" . $lastID . ".jpg");
+		if (file_exists("../../images/uploads/staffphoto_temp.jpg")) {
+			rename("../../images/uploads/staffphoto_temp.jpg", "../../images/staffpics/staffphoto_id" . $lastID . ".jpg");
+		}
+	}
+
+	if ($_POST['operation'] == 'update') {
+		while (true) {
+			if (file_exists("../../images/uploads/staffphoto_temp.jpg")) {
+				rename("../../images/uploads/staffphoto_temp.jpg", "../../images/staffpics/staffphoto_id" . $_POST['id'] . ".jpg");
+				break;
+			}
+		}
 	}
 }
 

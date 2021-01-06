@@ -2,10 +2,6 @@
 
 if (isset($_FILES['file']['name'])) {
 
-    /* Getting file name */
-    //$filename = $_FILES['file']['name'];
-    //$filename = "staffphoto_id_notassigned";
-
     /* Location */
     $location = "../../images/uploads/staffphoto_temp.jpg";
     $imageFileType = pathinfo($location, PATHINFO_EXTENSION);

@@ -339,6 +339,12 @@ form {
   width: 80%;
 }
 
+#edit-person-button-group {
+  padding-top: 5px;
+  font-size: 1.3em;
+  height: 2em;
+}
+
 .form-label {
   padding: 0;
   margin: 0 0 0 3px;
@@ -376,6 +382,16 @@ form {
   height: fit-content;
   min-height: 100px;
   margin-right: 5px;
+}
+
+#email-label {
+  padding-bottom: 0;
+}
+
+@media only screen and (max-width: 350px) {
+  .card-img-top {
+    width: 80%;
+  }
 }
 
 @media only screen and (min-width: 750px) {

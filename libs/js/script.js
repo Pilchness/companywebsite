@@ -232,7 +232,7 @@ const nameValidate = new RegExp(
 
 const handleEmailInput = (email) => {
   $('#email-info').replaceWith(
-    `<label>Email: </label> <input id="email-input" style="width: 14em" value="${email}" spellcheck="false"></input>`
+    `<label id="email-label">Email: </label> <input id="email-input" style="width: 14em" value="${email}" spellcheck="false"></input>`
   );
   $('#email-input').on('keyup', function () {
     if (emailValidate.test($(this).val())) {
@@ -371,13 +371,16 @@ const loadReportsPage = () => {
 
 let placeholder = 'false';
 
-const addNewPersonPhoto = () => {
-  $('#new-onboard').click(function () {
+const addNewPhoto = (id) => {
+  $('#new-onboard, #confirm-changes').click(function () {
     let fd = new FormData();
     let files = $('#file')[0].files;
     console.log(files);
-    // if(files.length <=0) {files = }
-    // Check file selected or not
+    if (files.length < 0) {
+      if (id) {
+        files = `images/staffphoto_id${id}.jpg`;
+      }
+    }
     if (files.length > 0) {
       fd.append('file', files[0]);
       $.ajax({
@@ -388,9 +391,10 @@ const addNewPersonPhoto = () => {
         processData: false,
         success: function (response) {
           if (response != 0) {
-            console.log(response);
-            //$('#img').attr('src', response);
-            //$('.preview img').show(); // Display image element
+            //$('#card-img-top').attr('src', `images/staffphoto_id${id}.jpg`);
+            window.name = id;
+            location.reload();
+            //loadPersonnelPage();
           } else {
             placeholder = 'true';
           }
@@ -401,6 +405,16 @@ const addNewPersonPhoto = () => {
     }
   });
 };
+
+const photoUploadForm = `    <form method="post" action="" enctype="multipart/form-data" id="myform">
+<div class="custom-file">
+  <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
+  <input type="file" class="custom-file-input" id="file" name="file" />
+</div>
+<button style="float: right; margin-right: -30px" id="new-onboard" value="Upload" class="btn btn-success button"
+  disabled>Add Employee</button>
+</div>
+</form>`;
 
 const loadOnboardPage = () => {
   changePageLayout('page');
@@ -436,15 +450,7 @@ const loadOnboardPage = () => {
         <select style="flex: 1; border-radius: 5px" class="custom-select add" id="department-selector"></select>
       </div>
 
-      <form method="post" action="" enctype="multipart/form-data" id="myform">
-        <div class="custom-file">
-          <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
-          <input type="file" class="custom-file-input" id="file" name="file" />
-        </div>
-        <button style="float: right; margin-right: -30px" id="new-onboard" value="Upload" class="btn btn-success button"
-          disabled>Add Employee</button>
-    </div>
-    </form>
+  ${photoUploadForm}
   </div>
 </div>
 </div>`
@@ -453,7 +459,7 @@ const loadOnboardPage = () => {
   updateProfileDepartmentList(1, 1);
   updateLocationAndDepartmentSelectors();
   handleOnboardInput();
-  addNewPersonPhoto();
+  addNewPhoto();
   $('#new-onboard').on('click', function () {
     addNewPersonToDatabase(
       $('#onboard-first-name').val(),
@@ -640,7 +646,9 @@ const toggleSearchBar = async () => {
   }
 };
 
-const updatePersonRecord = async (id, department, email) => {
+const updatePersonRecord = async (id, email, department) => {
+  console.log(id, email, department);
+
   personnelUpdate
     .updateData(id, email, department)
     .then(() => {
@@ -696,6 +704,8 @@ const loadPersonnelPage = () => {
       default:
         return;
     }
+    toggleScroll(true);
+    scrollReset();
   };
 
   loadPersonnelTab('directory');
@@ -730,7 +740,23 @@ const editPerson = async (id, location, department, email, locid) => {
   createLocationDropdown(location);
   updateProfileDepartmentList(locid, department);
   updateLocationAndDepartmentSelectors(locid, department);
+
+  $('#edit-button-group').remove();
+  $('#person-file-info')
+    .append(`<li><form method="post" action="" enctype="multipart/form-data" id="replaceform">
+  <div class="custom-file">
+    <label style="color: black" class="custom-file-label form-label" for="headshot-photo">Replace headshot photo (max 100kb)</label>
+    <input style="color: black" type="file" class="custom-file-input" id="file" name="file" />
+  </div>
+  <div id="edit-person-button-group" class="btn-group" role="group" aria-label="edit or offboard">
+  <button type="button" id="confirm-changes" class="btn btn-success confirm">Confirm</button>
+  <button type="button" class="btn btn-danger cancel">Cancel</button>
+  <button id="${id}" type="button" class="btn btn-secondary offboard">Offboard</button>
+</div>
+  </div>
+  </form></li>`);
   handleEmailInput(email);
+  addNewPhoto(id);
 };
 
 const offboardPerson = async (id, name) => {
@@ -774,6 +800,8 @@ const showPersonFile = async (id) => {
   if (!$('#main-content').length) {
     loadPersonnelPage();
   }
+  toggleScroll(false);
+  scrollReset();
   idQuery
     .readData(id)
     .then((response) => {
@@ -792,7 +820,7 @@ const showPersonFile = async (id) => {
           <li id="department-info">Department: ${person.department}</li>
           <li id="email-info">Email: ${person.email}</li>
         </ul>
-        <div class="btn-group" role="group" aria-label="edit or offboard">
+        <div id="edit-button-group" class="btn-group" role="group" aria-label="edit or offboard">
         <button id="${person.id}" location="${person.location}" locid="${person.locid}" 
               dept="${person.department}" email="${person.email}"
             type="button" class="btn btn-primary edit">Edit Details</button>
@@ -808,15 +836,16 @@ const showPersonFile = async (id) => {
           $(this).attr('email'),
           $(this).attr('locid')
         );
-        $('.edit').replaceWith(
-          `<button type="button" id="confirm-changes" class="btn btn-success confirm">Confirm</button>
-        <button type="button" class="btn btn-danger cancel">Cancel</button>`
-        );
+        // $('.edit').replaceWith(
+        //   `<button type="button" id="confirm-changes" class="btn btn-success confirm">Confirm</button>
+        // <button type="button" class="btn btn-danger cancel">Cancel</button>`
+        // );
         $('.confirm').on('click', function () {
+          console.log('updating record');
           updatePersonRecord(
             person.id,
-            $('#department-selector :selected').attr('value'),
-            $('#email-input').val()
+            $('#email-input').val(),
+            $('#department-selector :selected').attr('value')
           );
           showPersonFile(person.id);
         });
@@ -872,6 +901,21 @@ $(document).ready(function () {
   });
   loadDashboard();
 });
+
+function isInt(value) {
+  return (
+    !isNaN(value) &&
+    (function (x) {
+      return (x | 0) === x;
+    })(parseFloat(value))
+  );
+}
+
+if (isInt(window.name)) {
+  console.log(window.name);
+  messageDisplay('Profile has been updated successfully', 'blue');
+  window.name = null;
+}
 
 let notificationArray = [
   {
