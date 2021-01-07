@@ -314,6 +314,30 @@ const handleOnboardInput = () => {
   });
 };
 
+const authenticateFileType = () => {
+  $('#file').change(function () {
+    uploadPhoto = window.URL.createObjectURL(this.files[0]);
+    console.log(this.files[0].type);
+    if (this.files[0].type === 'image/jpeg') {
+      console.log('correct file type', this.files[0].type);
+      $('#confirm-changes, #new-onboard').removeAttr('disabled');
+      $('.card-img-top').attr('src', uploadPhoto);
+    } else {
+      if (this.files[0].type !== 'image/jpeg') {
+        $('#confirm-changes, #new-onboard').attr('disabled', true);
+        console.log('wrong file type', this.files[0].type);
+        $('.custom-file-input').text('Invalid File');
+        messageDisplay(
+          {
+            responseText: 'Wrong type of file'
+          },
+          'red'
+        );
+      }
+    }
+  });
+};
+
 const loadDashboard = () => {
   changePageLayout('main');
   toggleScroll(true);
@@ -440,6 +464,7 @@ const addNewPhoto = (id) => {
 
 const photoUploadForm = `    <form method="post" action="" enctype="multipart/form-data" id="myform">
 <div class="custom-file">
+  <img src="images/icons/placeholder.jpg" class="card-img-top" style="float: right; width: 50px; height: 50px;" />
   <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
   <input type="file" class="custom-file-input" id="file" name="file" />
 </div>
@@ -491,6 +516,7 @@ const loadOnboardPage = () => {
   updateProfileDepartmentList(1, 1);
   updateLocationAndDepartmentSelectors();
   handleOnboardInput();
+  authenticateFileType();
   addNewPhoto();
   $('#new-onboard').on('click', function () {
     addNewPersonToDatabase(
@@ -813,26 +839,7 @@ const editPerson = async (id, location, department, email, locid) => {
   </div>
   </form></li>`);
 
-  $('#file').change(function () {
-    uploadPhoto = window.URL.createObjectURL(this.files[0]);
-    console.log(this.files[0].type);
-    if (this.files[0].type === 'image/jpeg') {
-      console.log('correct file type', this.files[0].type);
-      $('#confirm-changes').removeAttr('disabled');
-      $('.card-img-top').attr('src', uploadPhoto);
-    } else {
-      if (this.files[0].type !== 'image/jpeg') {
-        $('#confirm-changes').attr('disabled', true);
-        console.log('wrong file type', this.files[0].type);
-        messageDisplay(
-          {
-            responseText: 'Wrong type of file'
-          },
-          'red'
-        );
-      }
-    }
-  });
+  authenticateFileType();
   handleEmailInput(email);
   addNewPhoto(id);
 };

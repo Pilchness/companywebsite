@@ -1,27 +1,10 @@
-<div
-  id="message-card${messageIndex}"
-  class="card message-card border-dark mb-1"
-  style="max-width: 100%"
->
-  <div class="card-header">
-    ${message.title}
-    <button
-      type="button"
-      id="message-close${messageIndex}"
-      class="btn-close message-close"
-      aria-label="Close"
-      onClick="removeMessage()"
-    ></button>
+<form method="post" action="" enctype="multipart/form-data" id="myform">
+  <div class="custom-file">
+  <img src="" class="card-img-top" max-width=50px max-height=50px style="float: right"/>
+    <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
+    <input type="file" class="custom-file-input" id="file" name="file" />
   </div>
-  <div class="card-body text-dark" id="message-body${messageIndex}">
-    <p class="message-text">
-      <img
-        id="message-image${messageIndex}"
-        class="message-image"
-        width="auto"
-        height="50px"
-        src="${message.image}"
-      />${message.message}
-    </p>
+  <button style="float: right; margin-right: -30px" id="new-onboard" value="Upload" class="btn btn-success button"
+    disabled>Add Employee</button>
   </div>
-</div>
+  </form>
