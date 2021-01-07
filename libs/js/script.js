@@ -320,7 +320,7 @@ const authenticateFileType = () => {
     console.log(this.files[0].type);
     if (this.files[0].type === 'image/jpeg') {
       console.log('correct file type', this.files[0].type);
-      $('#confirm-changes, #new-onboard').removeAttr('disabled');
+      //$('#confirm-changes, #new-onboard').removeAttr('disabled');
       $('.card-img-top').attr('src', uploadPhoto);
     } else {
       if (this.files[0].type !== 'image/jpeg') {
@@ -408,9 +408,104 @@ const loadDashboard = () => {
   // } else console.log(window.name);
 };
 
-const loadReportsPage = () => {
+const loadReportsPage = async () => {
   scrollReset();
   changePageLayout('page');
+  let staffdata;
+  let departmentdata;
+  let locationdata;
+  let largestdepartment = ['none', 0];
+  let initialcount = [];
+  const initialReportNumber = 5;
+  let initialReportList;
+
+  personnelDirectoryQuery
+    .readData('all_personnel')
+    .then((response) => {
+      staffdata = response;
+      console.log(staffdata);
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      alphabet.forEach((letter) => {
+        let lettercount = 0;
+        staffdata.forEach((person) => {
+          if (
+            person.firstName.charAt(0) === letter ||
+            person.firstName.charAt(0) === letter.toLowerCase()
+          ) {
+            lettercount++;
+          }
+        });
+        initialcount.push([letter, lettercount]);
+      });
+      initialcount.sort(function (a, b) {
+        return b[1] - a[1];
+      });
+      console.log(initialcount);
+      initialReportList = () => {
+        let reportListCode = '';
+        for (let i = 0; i < initialReportNumber; i++) {
+          reportListCode += `<li><div style="display: flex; flex-direction: row">${
+            initialcount[i][0]
+          }:&nbsp <div style="background-color: blue; height: 20px; width: ${
+            initialcount[i][1] * 10
+          }px"></div>&nbsp${initialcount[i][1]}<div></li>`;
+        }
+        return reportListCode;
+      };
+    })
+    .then(() => {
+      departmentDirectoryQuery
+        .readData('all')
+        .then((response) => {
+          departmentdata = response;
+          console.log(departmentdata);
+          departmentdata.forEach((department) => {
+            let departmentcount = 0;
+            staffdata.forEach((person) => {
+              //console.log(person.department, department)
+              if (person.department === department.name) {
+                departmentcount++;
+              }
+              //console.log(departmentcount);
+            });
+            if (departmentcount > largestdepartment[1]) {
+              largestdepartment = [department.name, departmentcount];
+            }
+          });
+        })
+        .then(() => {
+          locationDirectoryQuery
+            .readData('all')
+            .then((response) => {
+              locationdata = response;
+            })
+            .then(() => {
+              $('#page-content').append(
+                `<div id="page-content">
+          <div id="report-container">
+          <p class="body-text">
+            There are currently <strong>${
+              staffdata.length
+            }</strong> employees at Global Unity, 
+            working in <strong>${departmentdata.length}</strong> departments
+            over <strong>${
+              locationdata.length
+            }</strong> locations across the world.
+          </p>
+          <p class="body-text">The largest department is <strong>${
+            largestdepartment[0]
+          }</strong> 
+          with <strong>${largestdepartment[1]}</strong> employees.</p>
+          <p class="body-text">Out of the ${
+            staffdata.length
+          } employees, the ${initialReportNumber} most common first initals are:</p>
+          <br>
+          <ul style="padding-left: 20px; font-family: 'Oxygen Mono', monospace;">${initialReportList()}</ul>
+          <div></div>`
+              );
+            });
+        });
+    });
 };
 
 let placeholder = 'false';
@@ -464,7 +559,7 @@ const addNewPhoto = (id) => {
 
 const photoUploadForm = `    <form method="post" action="" enctype="multipart/form-data" id="myform">
 <div class="custom-file">
-  <img src="images/icons/placeholder.jpg" class="card-img-top" style="float: right; width: 50px; height: 50px;" />
+  <img src="images/icons/placeholder.jpg" class="card-img-top" id="preview-image"/>
   <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
   <input type="file" class="custom-file-input" id="file" name="file" />
 </div>
