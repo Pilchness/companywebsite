@@ -65,8 +65,8 @@ h3 {
   position: fixed;
   top: 90px;
   right: 0px;
-  left: 70px;
-  width: calc(100vw - 70px);
+  left: 66px;
+  width: calc(100vw - 66px);
   background: black;
   /* display: grid;
   place-items: center; */
@@ -302,7 +302,8 @@ label {
   display: flex;
   flex-direction: row;
   background-color: blanchedalmond;
-  margin: 1px;
+  margin-bottom: 10px;
+  margin-right: 5px;
   -webkit-column-break-inside: avoid;
   page-break-inside: avoid;
   break-inside: avoid;
@@ -395,50 +396,9 @@ form {
   height: 50px;
 }
 
-@media only screen and (max-width: 350px) {
-  .card-img-top {
-    width: 80%;
-  }
-
-  #preview-image {
-    width: 25px;
-    height: 25px;
-  }
-}
-
-@media only screen and (min-width: 750px) {
-  .icon {
-    max-width: 50px;
-    max-height: 50px;
-  }
-
-  #main-body {
-    grid-template-columns: minmax(90px, 10%) 1fr;
-  }
-
-  #personnel-button-container {
-    margin-left: 80px;
-  }
-}
-
-@media only screen and (min-width: 1000px) {
-  .icon {
-    width: 140px;
-    height: 140px;
-    margin: 40px 10px;
-  }
-
-  header {
-    height: 250px;
-  }
-
-  #main-content-header {
-    top: 250px;
-  }
-
-  #main-content {
-    margin-top: 200px;
-  }
+#report-list {
+  padding-left: 20px;
+  font-family: 'Oxygen Mono', monospace;
 }
 
 /* Container */
@@ -470,4 +430,184 @@ form {
   color: white;
   padding: 5px 15px;
   margin-left: 10px;
+}
+
+@media only screen and (max-width: 350px) {
+  .card-img-top {
+    width: 80%;
+  }
+
+  #preview-image {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+@media only screen and (min-width: 750px) {
+  .icon {
+    max-width: 50px;
+    max-height: 50px;
+  }
+
+  #main-body {
+    grid-template-columns: minmax(90px, 10%) 1fr;
+  }
+
+  #personnel-button-container {
+    margin-left: 80px;
+  }
+
+  .message-card {
+    width: 90%;
+  }
+
+  .directory-card {
+    width: 95%;
+  }
+
+  #main-content-header {
+    top: 180px;
+  }
+
+  #page-content {
+    margin-top: 250px;
+    margin-left: 25px;
+  }
+
+  #page-title {
+    font-size: 2em;
+  }
+
+  header {
+    min-height: 182px;
+  }
+
+  #main-directory,
+  #department-list,
+  #location-list {
+    margin-left: 22px;
+  }
+
+  .directory-content {
+    margin-top: 280px !important;
+  }
+
+  #person-file {
+    margin-left: 25px;
+    width: 91%;
+    padding-bottom: 20px;
+  }
+
+  .directory-content > .card-img-top {
+    width: 60% !important;
+  }
+
+  h2.card-title {
+    font-size: 1.8em;
+  }
+
+  #person-file-info {
+    font-size: 1.5em;
+  }
+
+  #delete-person-warning {
+    margin-left: 40px;
+    margin-top: 10px;
+  }
+
+  .person-card-text {
+    font-size: 1em;
+  }
+
+  .headshot {
+    width: 100px;
+    height: 100px;
+  }
+
+  .dept-photo,
+  .location-photo {
+    width: auto !important;
+    height: auto;
+    margin-bottom: 2px;
+    margin-right: 2px;
+  }
+
+  .custom-select {
+    height: 2em;
+  }
+
+  p.body-text {
+    font-size: 1.5em;
+    width: 500px;
+    margin-left: 50px;
+  }
+
+  #report-list {
+    margin-left: 80px;
+    font-size: 1.5em;
+  }
+
+  .bar-chart {
+    height: 30px !important;
+  }
+
+  .form-control,
+  .custom-select {
+    height: 40px;
+    font-size: 1em;
+  }
+
+  #preview-image {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    top: -100px;
+  }
+
+  #onboard-form {
+    margin-left: 100px;
+  }
+
+  #new-onboard {
+    margin-right: -100px !important;
+    font-size: 1.2em;
+  }
+
+  .btn-group,
+  .btn {
+    font-size: 1.2em !important;
+    height: 2em !important;
+  }
+
+  #file {
+    font-size: 1em;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
+
+  #report-container {
+    margin-left: 50px;
+  }
+}
+
+@media only screen and (min-width: 1000px) {
+  .icon {
+    width: 140px;
+    height: 140px;
+    margin: 40px 10px;
+  }
+
+  header {
+    height: 250px;
+  }
+
+  #main-content-header {
+    top: 250px;
+  }
+
+  #main-content {
+    margin-top: 200px;
+  }
 }

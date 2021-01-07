@@ -446,7 +446,7 @@ const loadReportsPage = async () => {
         for (let i = 0; i < initialReportNumber; i++) {
           reportListCode += `<li><div style="display: flex; flex-direction: row">${
             initialcount[i][0]
-          }:&nbsp <div style="background-color: blue; height: 20px; width: ${
+          }:&nbsp <div class="bar-chart" style="background-color: blue; height: 20px; width: ${
             initialcount[i][1] * 10
           }px"></div>&nbsp${initialcount[i][1]}<div></li>`;
         }
@@ -481,8 +481,7 @@ const loadReportsPage = async () => {
             })
             .then(() => {
               $('#page-content').append(
-                `<div id="page-content">
-          <div id="report-container">
+                `<div id="report-container">
           <p class="body-text">
             There are currently <strong>${
               staffdata.length
@@ -500,8 +499,8 @@ const loadReportsPage = async () => {
             staffdata.length
           } employees, the ${initialReportNumber} most common first initals are:</p>
           <br>
-          <ul style="padding-left: 20px; font-family: 'Oxygen Mono', monospace;">${initialReportList()}</ul>
-          <div></div>`
+          <ul id="report-list">${initialReportList()}</ul>
+          <div>`
               );
             });
         });
@@ -571,7 +570,7 @@ const photoUploadForm = `    <form method="post" action="" enctype="multipart/fo
 const loadOnboardPage = () => {
   changePageLayout('page');
   $('#page-content').append(
-    `<div id="page-content">
+    `<div id="onboard-form">
   <div id="form-container">
     <p class="body-text">
       To add a new person to the database, complete their details below and then
@@ -604,8 +603,7 @@ const loadOnboardPage = () => {
 
   ${photoUploadForm}
   </div>
-</div>
-</div>`
+</div></div>`
   );
   createLocationDropdown();
   updateProfileDepartmentList(1, 1);
@@ -671,7 +669,7 @@ const departmentList = async () => {
   departmentDirectoryQuery.readData('all').then((response) => {
     response.forEach((department) => {
       $('#department-list')
-        .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
+        .append(`<div class="card directory-card border-dark mb-1" style="max-width: 100%;">
         <div class="card-header">${department.name}</div>
         <div class="dept-card-body text-dark">
           <ul id="personnel-dept-${department.id}" class="dept-section">
@@ -709,7 +707,7 @@ const locationList = async () => {
     .then((response) => {
       response.forEach((location) => {
         $('#location-list')
-          .append(`<div class="card border-dark mb-1" style="max-width: 100%;">
+          .append(`<div class="card directory-card border-dark mb-1" style="max-width: 100%;">
         <div class="card-header">${location.name}</div>
         <div class="dept-card-body text-dark">
           <ul id="personnel-dept-${location.id}" class="location-section">
