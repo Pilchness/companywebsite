@@ -880,10 +880,11 @@ form {
 
   #personnel-button-container {
     margin-left: 462px;
+    width: 45vw;
   }
 
   .message-card {
-    width: 45%;
+    width: 52%;
   }
 
   .card-header {
@@ -892,17 +893,23 @@ form {
 
   #main-content-header {
     top: 500px;
-    left: calc(20vw + 195px);
-    width: 50vw;
-    height: 125px;
+    left: calc(20vw + 172px);
+    width: 56vw;
+    height: 288px;
+  }
+
+  #directory-personnel-button,
+  #departments-personnel-button,
+  #locations-personnel-button {
+    width: 20vw;
   }
 
   header {
-    height: 220px;
+    min-height: 500px;
   }
 
   #page-content {
-    margin-top: 700px;
+    margin-top: 830px;
     margin-left: 100px;
     width: calc(100vw - 200px);
   }
@@ -918,10 +925,16 @@ form {
 
   #main-content {
     margin-left: -80px;
+    width: 55vw;
   }
 
   p.message-text {
     font-size: 4em;
+    padding: 50px;
+  }
+
+  .card-header {
+    padding-left: 50px;
   }
 
   .message-close {
@@ -934,10 +947,13 @@ form {
     font-size: 6em;
   }
 
-  #main-directory,
+  #main-directory {
+    margin-left: 146px;
+  }
+
   #department-list,
   #location-list {
-    margin-left: 425px;
+    margin-left: 150px;
   }
 
   .directory-content {
@@ -968,12 +984,12 @@ form {
   }
 
   .person-card-text {
-    font-size: 5em;
+    font-size: 4em;
   }
 
   .headshot {
-    width: 120px;
-    height: 120px;
+    width: 420px;
+    height: 400px;
   }
 
   .small-headshot {
@@ -1035,6 +1051,10 @@ form {
     font-size: 1.2em;
   }
 
+  .directory-card {
+    width: 99%;
+  }
+
   .btn-group,
   .btn {
     font-size: 1.5em !important;
@@ -1063,11 +1083,27 @@ form {
   }
 
   #search-icon {
-    height: 50px;
-    width: 50px;
+    height: 150px;
+    width: 150px;
   }
 
   #report-container {
     margin-left: 50px;
+  }
+
+  #search-bar {
+    margin-left: 3019px;
+  }
+
+  #name-search,
+  #department-search,
+  #department-search-select {
+    width: 650px;
+    height: 150px;
+    font-size: 4em;
+  }
+
+  #main-content {
+    overflow: hidden;
   }
 }
