@@ -232,6 +232,10 @@ label {
   padding: 5px 5px 5px 10px;
 }
 
+.message-card {
+  max-width: 99%;
+}
+
 .dept-section,
 .location-section {
   columns: 2;
@@ -441,6 +445,25 @@ form {
     width: 25px;
     height: 25px;
   }
+
+  h3 {
+    font-size: 0.6em;
+    margin-bottom: 4px;
+  }
+
+  #main-directory {
+    margin-top: 154px !important;
+  }
+
+  p.body-text {
+    padding-right: 20px;
+  }
+
+  #new-onboard {
+    height: 1.8em;
+    font-size: 0.8em;
+    padding-top: 2px;
+  }
 }
 
 @media only screen and (min-width: 750px) {
@@ -462,16 +485,42 @@ form {
   }
 
   .directory-card {
-    width: 95%;
+    width: 97%;
+  }
+
+  .message-close {
+    width: 10px;
+    height: 10px;
+    margin: 10px;
   }
 
   #main-content-header {
     top: 180px;
+    left: 70px;
+    width: calc(100vw - 90px);
+  }
+
+  #name-search,
+  #department-search-select {
+    height: 50px;
+    width: 306px;
+  }
+
+  #name-search {
+    margin-left: 40px;
   }
 
   #page-content {
-    margin-top: 250px;
+    margin-top: 270px;
     margin-left: 25px;
+  }
+
+  p.message-text {
+    font-size: 1.3em;
+  }
+
+  #onboard-paragraph {
+    margin-left: 0;
   }
 
   #page-title {
@@ -490,6 +539,186 @@ form {
 
   .directory-content {
     margin-top: 280px !important;
+  }
+
+  #person-file {
+    margin-left: 25px;
+    width: 93%;
+    padding-bottom: 20px;
+  }
+
+  .directory-content > .card-img-top {
+    width: 60% !important;
+  }
+
+  h2.card-title {
+    font-size: 1.8em;
+  }
+
+  #person-file-info {
+    font-size: 1.5em;
+  }
+
+  #delete-person-warning {
+    margin-left: 40px;
+    margin-top: 10px;
+  }
+
+  .person-card-text {
+    font-size: 1em;
+  }
+
+  #sidebar-holder {
+    margin-left: 25px;
+  }
+
+  #search-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .headshot {
+    width: 100px;
+    height: 100px;
+  }
+
+  .dept-photo,
+  .location-photo {
+    width: auto !important;
+    height: auto;
+    margin-bottom: 2px;
+    margin-right: 2px;
+  }
+
+  p.body-text {
+    font-size: 1.5em;
+    width: 500px;
+    margin-left: 50px;
+  }
+
+  #report-list {
+    margin-left: 80px;
+    font-size: 1.5em;
+  }
+
+  .bar-chart {
+    height: 30px !important;
+  }
+
+  .form-control,
+  .custom-select {
+    height: 40px;
+    font-size: 0.8em;
+  }
+
+  #preview-image {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    top: -100px;
+  }
+
+  #onboard-form {
+    margin-left: 100px;
+  }
+
+  #new-onboard {
+    margin-right: -100px !important;
+    font-size: 1.2em;
+  }
+
+  .btn-group,
+  .btn {
+    font-size: 20px !important;
+    height: 40px !important;
+  }
+
+  #file {
+    font-size: 1em;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
+
+  #report-container {
+    margin-left: 50px;
+  }
+}
+
+@media only screen and (min-width: 1000px) {
+  .icon {
+    min-width: 80px;
+    min-height: 80px;
+  }
+
+  #main-body {
+    grid-template-columns: minmax(90px, 10%) 1fr;
+  }
+
+  .left-sidebar {
+    width: 140px;
+  }
+
+  #sidebar-holder {
+    width: 150px;
+  }
+
+  #personnel-button-container {
+    margin-left: 80px;
+  }
+
+  .message-card {
+    width: 90%;
+  }
+
+  #main-content-header {
+    top: 220px;
+    left: 135px;
+    width: calc(100vw - 145px);
+    height: 120px;
+  }
+
+  header {
+    height: 220px;
+  }
+
+  #page-content {
+    margin-top: 350px;
+    margin-left: 100px;
+    width: calc(100vw - 200px);
+  }
+
+  #sidebar-holder {
+    margin-left: 5px;
+  }
+
+  #main-content {
+    margin-left: 60px;
+  }
+
+  p.message-text {
+    font-size: 1.4em;
+  }
+
+  .message-close {
+    width: 10px;
+    height: 10px;
+    margin: 10px;
+  }
+
+  #page-title {
+    font-size: 2.5em;
+  }
+
+  #main-directory,
+  #department-list,
+  #location-list {
+    margin-left: 17px;
+  }
+
+  .directory-content {
+    margin-top: 342px !important;
   }
 
   #person-file {
@@ -516,12 +745,17 @@ form {
   }
 
   .person-card-text {
-    font-size: 1em;
+    font-size: 1.5em;
   }
 
   .headshot {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
+  }
+
+  .small-headshot {
+    width: 60px;
+    height: 60px;
   }
 
   .dept-photo,
@@ -537,77 +771,303 @@ form {
   }
 
   p.body-text {
-    font-size: 1.5em;
-    width: 500px;
-    margin-left: 50px;
+    font-size: 2em;
+    width: 800px;
+    margin-left: 60px;
+  }
+
+  #onboard-paragraph {
+    margin-left: 0px !important;
+    padding-bottom: 30px;
   }
 
   #report-list {
     margin-left: 80px;
-    font-size: 1.5em;
+    font-size: 1.8em;
   }
 
   .bar-chart {
-    height: 30px !important;
+    height: 40px !important;
   }
 
   .form-control,
   .custom-select {
-    height: 40px;
-    font-size: 1em;
+    height: 60px;
+    font-size: 1.8em;
   }
 
   #preview-image {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     position: relative;
     top: -100px;
   }
 
   #onboard-form {
-    margin-left: 100px;
+    margin-left: 150px;
   }
 
   #new-onboard {
-    margin-right: -100px !important;
+    margin-right: -150px !important;
     font-size: 1.2em;
   }
 
   .btn-group,
   .btn {
-    font-size: 1.2em !important;
-    height: 2em !important;
+    font-size: 1.5em !important;
+    height: 2.2em !important;
+  }
+
+  .custom-file-label {
+    font-size: 1.2em;
+    padding-top: 30px;
+  }
+
+  .form-label {
+    font-size: 1.2em;
+  }
+
+  .form-control {
+    margin-bottom: 20px;
   }
 
   #file {
-    font-size: 1em;
+    font-size: 1.4em;
   }
 
   h3 {
-    font-size: 1.2em;
+    font-size: 1.8em;
+  }
+
+  #search-icon {
+    height: 50px;
+    width: 50px;
   }
 
   #report-container {
     margin-left: 50px;
   }
 }
-
-@media only screen and (min-width: 1000px) {
-  .icon {
-    width: 140px;
-    height: 140px;
-    margin: 40px 10px;
+/* xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
+@media only screen and (min-width: 1500px) {
+  body {
+    margin-left: 20vw;
+    margin-right: 20vw;
+    background: black;
   }
 
-  header {
-    height: 250px;
+  #logo {
+    left: 20vw;
+  }
+
+  .icon {
+    min-width: 200px;
+    min-height: 200px;
+    margin: 40px;
+  }
+
+  #main-body {
+    grid-template-columns: minmax(350px, 10%) 1fr;
+  }
+
+  .left-sidebar {
+    width: 350px;
+  }
+
+  #sidebar-holder {
+    width: 300px;
+  }
+
+  #personnel-button-container {
+    margin-left: 462px;
+  }
+
+  .message-card {
+    width: 45%;
+  }
+
+  .card-header {
+    font-size: 5em;
   }
 
   #main-content-header {
-    top: 250px;
+    top: 500px;
+    left: calc(20vw + 195px);
+    width: 50vw;
+    height: 125px;
+  }
+
+  header {
+    height: 220px;
+  }
+
+  #page-content {
+    margin-top: 700px;
+    margin-left: 100px;
+    width: calc(100vw - 200px);
+  }
+
+  .message-image {
+    width: 200px;
+    height: 200px;
+  }
+
+  #sidebar-holder {
+    margin-left: 20vw;
   }
 
   #main-content {
-    margin-top: 200px;
+    margin-left: -80px;
+  }
+
+  p.message-text {
+    font-size: 4em;
+  }
+
+  .message-close {
+    width: 10px;
+    height: 10px;
+    margin: 10px;
+  }
+
+  #page-title {
+    font-size: 6em;
+  }
+
+  #main-directory,
+  #department-list,
+  #location-list {
+    margin-left: 425px;
+  }
+
+  .directory-content {
+    margin-top: 800px !important;
+  }
+
+  #person-file {
+    margin-left: 25px;
+    width: 91%;
+    padding-bottom: 20px;
+  }
+
+  .directory-content > .card-img-top {
+    width: 60% !important;
+  }
+
+  h2.card-title {
+    font-size: 1.8em;
+  }
+
+  #person-file-info {
+    font-size: 1.5em;
+  }
+
+  #delete-person-warning {
+    margin-left: 40px;
+    margin-top: 10px;
+  }
+
+  .person-card-text {
+    font-size: 5em;
+  }
+
+  .headshot {
+    width: 120px;
+    height: 120px;
+  }
+
+  .small-headshot {
+    width: 60px;
+    height: 60px;
+  }
+
+  .dept-photo,
+  .location-photo {
+    width: auto !important;
+    height: auto;
+    margin-bottom: 2px;
+    margin-right: 2px;
+  }
+
+  .custom-select {
+    height: 2em;
+  }
+
+  p.body-text {
+    font-size: 2em;
+    width: 800px;
+    margin-left: 60px;
+  }
+
+  #onboard-paragraph {
+    margin-left: 0px !important;
+    padding-bottom: 30px;
+  }
+
+  #report-list {
+    margin-left: 80px;
+    font-size: 1.8em;
+  }
+
+  .bar-chart {
+    height: 40px !important;
+  }
+
+  .form-control,
+  .custom-select {
+    height: 60px;
+    font-size: 1.8em;
+  }
+
+  #preview-image {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    top: -100px;
+  }
+
+  #onboard-form {
+    margin-left: 150px;
+  }
+
+  #new-onboard {
+    margin-right: -150px !important;
+    font-size: 1.2em;
+  }
+
+  .btn-group,
+  .btn {
+    font-size: 1.5em !important;
+    height: 2.2em !important;
+  }
+
+  .custom-file-label {
+    font-size: 1.2em;
+    padding-top: 30px;
+  }
+
+  .form-label {
+    font-size: 1.2em;
+  }
+
+  .form-control {
+    margin-bottom: 20px;
+  }
+
+  #file {
+    font-size: 1.4em;
+  }
+
+  h3 {
+    font-size: 5em;
+  }
+
+  #search-icon {
+    height: 50px;
+    width: 50px;
+  }
+
+  #report-container {
+    margin-left: 50px;
   }
 }

@@ -356,7 +356,6 @@ const loadDashboard = () => {
     <div
     id="message-card${messageIndex}"
     class="card message-card border-dark mb-1"
-    style="max-width: 100%"
   >
     <div class="card-header">
       ${message.title}
@@ -572,7 +571,7 @@ const loadOnboardPage = () => {
   $('#page-content').append(
     `<div id="onboard-form">
   <div id="form-container">
-    <p class="body-text">
+    <p id="onboard-paragraph" class="body-text">
       To add a new person to the database, complete their details below and then
       click the <strong>Add Employee</strong> button.
     </p>
@@ -682,7 +681,7 @@ const departmentList = async () => {
           response.forEach((departmentMember) => {
             $(`#personnel-dept-${department.id}`).append(
               `<div class="dept-photo headshot" id="${departmentMember.id}">
-            <img src='images/staffpics/staffphoto_id${departmentMember.id}.jpg' 
+            <img class="small-headshot" src='images/staffpics/staffphoto_id${departmentMember.id}.jpg' 
             width="30px" height="30px"/>
             <span class="person-card-text">${departmentMember.firstName} ${departmentMember.lastName}</span></div>`
             );
@@ -720,7 +719,7 @@ const locationList = async () => {
             response.forEach((locationMember) => {
               $(`#personnel-dept-${location.id}`).append(
                 `<div class="location-photo headshot" id="${locationMember.id}">
-            <img src='images/staffpics/staffphoto_id${locationMember.id}.jpg' width="30px" height="30px"/>
+            <img class="small-headshot" src='images/staffpics/staffphoto_id${locationMember.id}.jpg' width="30px" height="30px"/>
             <span class="person-card-text">${locationMember.firstName} ${locationMember.lastName} (${locationMember.department})</span></div>`
               );
             });
