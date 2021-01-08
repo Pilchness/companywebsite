@@ -407,6 +407,45 @@ const loadDashboard = () => {
   // } else console.log(window.name);
 };
 
+const loadSettings = () => {
+  scrollReset();
+  changePageLayout('page');
+  $('#page-content').append(
+    `<div id="settings-container">
+    <h2>General Settings</h2>
+ 
+    <h2>Rename, Add and Delete Departments</h2>
+    <select
+    style="flex: 1; border-radius: 5px"
+    class="custom-select"
+    id="department-search-select"
+  >  <option id="0" selected>Choose a department...</option>
+  </select>
+  <div id="edit-departments-button-group" class="btn-group" role="group" aria-label="edit departments">
+  <button type="button" id="confirm-changes" class="btn btn-danger confirma">Delete</button>
+  <button type="button" class="btn btn-warning cancel">Edit</button>
+  <button id="add-department" type="button" class="btn btn-secondary offboard">Add</button>
+</div>
+  <br>
+  <br>
+    <h2>Rename, Add and Delete Locations</h2>
+    <select
+    style="flex: 1; border-radius: 5px"
+    class="custom-select"
+    id="location-search-select"
+  >  <option id="0" selected>Choose a location...</option>
+  </select>
+  <div id="edit-locations-button-group" class="btn-group" role="group" aria-label="edit locations">
+  <button type="button" id="confirm-changes" class="btn btn-danger confirma">Delete</button>
+  <button type="button" class="btn btn-warning cancel">Edit</button>
+  <button id="add-department" type="button" class="btn btn-secondary offboard">Add</button>
+</div>
+</div>`
+  );
+  populateDepartmentSelector(false);
+  populateLocationSelector();
+};
+
 const loadReportsPage = async () => {
   scrollReset();
   changePageLayout('page');
@@ -745,12 +784,27 @@ const locationList = async () => {
     });
 };
 
-const populateDepartmentSelector = () => {
+const populateDepartmentSelector = (shorten = true) => {
   departmentDirectoryQuery.readData('all').then((response) => {
     response.forEach((department) => {
+      const departmentName = () => {
+        if (shorten) {
+          return shortenDepartmentString(department.name, 14);
+        } else return department.name;
+      };
       $('#department-search-select').append(
-        `<option id="${department.id}">${shortenDepartmentString(
-          department.name,
+        `<option id="${department.id}">${departmentName()}</option>`
+      );
+    });
+  });
+};
+
+const populateLocationSelector = () => {
+  locationDirectoryQuery.readData('all').then((response) => {
+    response.forEach((location) => {
+      $('#location-search-select').append(
+        `<option id="${location.id}">${shortenDepartmentString(
+          location.name,
           14
         )}</option>`
       );
@@ -1089,6 +1143,10 @@ $(document).ready(function () {
     $('#personnel-button-container').remove();
     loadPage($(this).attr('id'));
     $('.directory-content').css('margin-top', marginTop[0]);
+  });
+  $('#settings-icon').on('click', function () {
+    $('#page-title').text('Settings and Admin Functions');
+    loadSettings();
   });
   $(document).on('click', '.headshot', function () {
     showPersonFile($(this).attr('id'));

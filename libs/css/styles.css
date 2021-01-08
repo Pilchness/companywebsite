@@ -12,7 +12,15 @@ html,
 body {
   max-width: 100% !important;
   overflow-x: hidden !important;
-  /* overflow-y: hidden !important; */
+}
+
+#settings-icon {
+  width: 30px;
+  height: 30px;
+  margin: 20px;
+  position: fixed;
+  top: 0;
+  right: 0;
 }
 
 h2 {
@@ -59,6 +67,15 @@ h3 {
 #personnel-button-container {
   margin-left: 0px;
   float: right;
+}
+
+#settings-container {
+  color: white;
+  margin-top: 150px;
+}
+
+#settings-container > h2 {
+  color: white;
 }
 
 #main-content-header {
@@ -296,7 +313,8 @@ label {
 }
 
 #name-search,
-#department-search-select {
+#department-search-select,
+#location-search-select {
   height: 32px;
 }
 
@@ -405,8 +423,7 @@ form {
   font-family: 'Oxygen Mono', monospace;
 }
 
-/* Container */
-.container {
+/* .container {
   margin: 0 auto;
   border: 0px solid black;
   width: 50%;
@@ -415,7 +432,7 @@ form {
   background-color: ghostwhite;
   text-align: center;
 }
-/* Preview */
+
 .preview {
   width: 100px;
   height: 100px;
@@ -427,14 +444,14 @@ form {
 .preview img {
   display: none;
 }
-/* Button */
+
 .button {
   border: 0px;
   background-color: deepskyblue;
   color: white;
   padding: 5px 15px;
   margin-left: 10px;
-}
+} */
 
 @media only screen and (max-width: 350px) {
   .card-img-top {
@@ -467,6 +484,12 @@ form {
 }
 
 @media only screen and (min-width: 750px) {
+  #settings-icon {
+    width: 60px;
+    height: 60px;
+    margin: 30px;
+  }
+
   .icon {
     max-width: 50px;
     max-height: 50px;
@@ -501,7 +524,8 @@ form {
   }
 
   #name-search,
-  #department-search-select {
+  #department-search-select,
+  #location-search-select {
     height: 50px;
     width: 306px;
   }
@@ -647,6 +671,17 @@ form {
 }
 
 @media only screen and (min-width: 1000px) {
+  #settings-icon {
+    width: 80px;
+    height: 80px;
+    margin: 60px;
+  }
+
+  #logo {
+    left: 30px;
+    top: 20px;
+  }
+
   .icon {
     min-width: 80px;
     min-height: 80px;
@@ -1097,7 +1132,8 @@ form {
 
   #name-search,
   #department-search,
-  #department-search-select {
+  #department-search-select,
+  #location-search-select {
     width: 650px;
     height: 150px;
     font-size: 4em;
