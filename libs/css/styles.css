@@ -25,6 +25,10 @@ body {
 
 h2 {
   color: black;
+  font-size: 0.8em;
+}
+
+h2.card-title {
   font-size: 1em;
 }
 
@@ -80,7 +84,7 @@ h3 {
 
 #main-content-header {
   position: fixed;
-  top: 90px;
+  top: 89px;
   right: 0px;
   left: 66px;
   width: calc(100vw - 66px);
@@ -285,7 +289,8 @@ label {
 
 #person-file {
   width: 98%;
-  margin-left: 5px;
+  margin-left: 2px;
+  margin-top: 163px !important;
 }
 
 #person-file-body {
@@ -307,14 +312,16 @@ label {
 
 .form-control,
 .custom-select {
-  font-size: 0.8em;
-  height: 24px;
-  margin: 2px;
+  font-size: 1em;
+  height: 32px;
+  margin: 0;
 }
 
 #name-search,
 #department-search-select,
-#location-search-select {
+#location-search-select,
+#department-edit-select,
+#location-edit-select {
   height: 32px;
 }
 
@@ -416,11 +423,18 @@ form {
   float: right;
   width: 50px;
   height: 50px;
+  position: relative;
+  top: 26px;
+  left: 20px;
 }
 
 #report-list {
   padding-left: 20px;
   font-family: 'Oxygen Mono', monospace;
+}
+
+#profile-label {
+  top: 38px;
 }
 
 /* .container {
@@ -453,14 +467,25 @@ form {
   margin-left: 10px;
 } */
 
+.custom-file {
+  position: relative;
+  top: -16px;
+}
+
+.custom-file-label {
+  position: relative;
+  top: 27px;
+}
+
 @media only screen and (max-width: 350px) {
   .card-img-top {
     width: 80%;
   }
 
   #preview-image {
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
+    top: 20px;
   }
 
   h3 {
@@ -481,6 +506,41 @@ form {
     font-size: 0.8em;
     padding-top: 2px;
   }
+
+  .custom-file {
+    position: relative;
+    top: -8px;
+  }
+
+  .custom-file-label {
+    top: 11px;
+    font-size: 0.8em;
+  }
+
+  .form-control {
+    height: 26px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .body-text {
+    font-size: 0.7em;
+  }
+
+  .form-label {
+    font-size: 0.6em !important;
+  }
+
+  #department-search-select,
+  #name-search {
+    font-size: 0.8em !important;
+    padding-left: 4px;
+  }
+
+  #department-list,
+  #location-list {
+    margin-top: 153px !important;
+  }
 }
 
 @media only screen and (min-width: 750px) {
@@ -493,6 +553,18 @@ form {
   .icon {
     max-width: 50px;
     max-height: 50px;
+  }
+
+  .custom-file {
+    top: 26px;
+  }
+
+  .custom-file-label {
+    top: -4px;
+  }
+
+  #preview-image {
+    left: -3px;
   }
 
   #main-body {
@@ -632,7 +704,7 @@ form {
   .form-control,
   .custom-select {
     height: 40px;
-    font-size: 0.8em;
+    font-size: 1.2em;
   }
 
   #preview-image {

@@ -29,62 +29,230 @@ if (mysqli_connect_errno()) {
 }
 
 switch ($_POST['querytype']) {
+
 	case 'personnel':
 
-		if ($_POST['search'] === 'all_personnel' || $_POST['search'] === '') {
-			if ($_POST['param'] == 0) {
+		switch ($_POST['operation']) {
 
-				$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
-								FROM personnel p 
-								LEFT JOIN department d ON (d.id = p.departmentID) 
-								LEFT JOIN location l ON (l.id = d.locationID) 
-								ORDER BY p.lastName, p.firstName, d.name, l.name';
-			} else {
-				$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
-				FROM personnel p
-				LEFT JOIN department d ON (d.id = p.departmentID) 
-				LEFT JOIN location l ON (l.id = d.locationID) 
-				WHERE d.id = ' . $_POST['param'] . '
-				ORDER BY p.lastName, p.firstName, d.name, l.name';
-			}
-		} else {
-			if ($_POST['param'] == 0) {
-				$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
-				FROM personnel p
-				LEFT JOIN department d ON (d.id = p.departmentID) 
-				LEFT JOIN location l ON (l.id = d.locationID) 
-				WHERE p.firstName LIKE "%' . $_POST['search'] . '%"
-				OR p.lastName LIKE "%' . $_POST['search'] . '%"
-				OR p.email LIKE "%' . $_POST['search'] . '%"
-				ORDER BY p.lastName, p.firstName, d.name, l.name';
-			} else {
-				$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+			case 'create':
+				$jobTitle = "";
+				$query = 'INSERT INTO personnel (firstName, lastName, jobTitle, email, departmentID, id) 
+				SELECT "' . $_POST['name'] . '","' . $_POST['lastName'] . '","' . $jobTitle . '","' . $_POST['email'] . '","' . $_POST['ID'] .
+					'", MAX(id) + 1 FROM personnel';
+				break;
+
+			case 'read':
+				//echo ("Reading Personnel Data");
+				//echo ($_POST['search']);
+				switch ($_POST['search']) {
+					case 'all':
+					case '':
+						if ($_POST['param'] == 0) {
+
+							$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+									FROM personnel p 
+									LEFT JOIN department d ON (d.id = p.departmentID) 
+									LEFT JOIN location l ON (l.id = d.locationID) 
+									ORDER BY p.lastName, p.firstName, d.name, l.name';
+						} else {
+							$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
 									FROM personnel p
 									LEFT JOIN department d ON (d.id = p.departmentID) 
 									LEFT JOIN location l ON (l.id = d.locationID) 
 									WHERE d.id = ' . $_POST['param'] . '
-									AND (p.firstName LIKE "%' . $_POST['search'] . '%"
-									OR p.lastName LIKE "%' . $_POST['search'] . '%"
-									OR p.email LIKE "%' . $_POST['search'] . '%")
 									ORDER BY p.lastName, p.firstName, d.name, l.name';
-			}
+						}
+						break;
+
+					case 'id':
+
+						$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location, l.id as locid 
+									FROM personnel p 
+									LEFT JOIN department d ON (d.id = p.departmentID) 
+									LEFT JOIN location l ON (l.id = d.locationID)
+									WHERE p.id =' . $_POST['param'];
+						break;
+
+
+					default:
+						if ($_POST['param'] == 0) {
+							$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+										FROM personnel p
+										LEFT JOIN department d ON (d.id = p.departmentID) 
+										LEFT JOIN location l ON (l.id = d.locationID) 
+										WHERE p.firstName LIKE "%' . $_POST['search'] . '%"
+										OR p.lastName LIKE "%' . $_POST['search'] . '%"
+										OR p.email LIKE "%' . $_POST['search'] . '%"
+										ORDER BY p.lastName, p.firstName, d.name, l.name';
+						} else {
+							$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+										FROM personnel p
+										LEFT JOIN department d ON (d.id = p.departmentID) 
+										LEFT JOIN location l ON (l.id = d.locationID) 
+										WHERE d.id = ' . $_POST['param'] . '
+										AND (p.firstName LIKE "%' . $_POST['search'] . '%"
+										OR p.lastName LIKE "%' . $_POST['search'] . '%"
+										OR p.email LIKE "%' . $_POST['search'] . '%")
+										ORDER BY p.lastName, p.firstName, d.name, l.name';
+						}
+						break;
+				}
+				break;
+
+
+
+
+
+
+
+
+
+
+
+				// if ($_POST['search'] === 'all' || $_POST['search'] === '') {
+				// 	if ($_POST['param'] == 0) {
+
+				// 		$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+				// 				FROM personnel p 
+				// 				LEFT JOIN department d ON (d.id = p.departmentID) 
+				// 				LEFT JOIN location l ON (l.id = d.locationID) 
+				// 				ORDER BY p.lastName, p.firstName, d.name, l.name';
+				// 	} else {
+				// 		$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+				// FROM personnel p
+				// LEFT JOIN department d ON (d.id = p.departmentID) 
+				// LEFT JOIN location l ON (l.id = d.locationID) 
+				// WHERE d.id = ' . $_POST['param'] . '
+				// ORDER BY p.lastName, p.firstName, d.name, l.name';
+				// 	}
+				// } else {
+				// 	if ($_POST['param'] == 0) {
+				// 		$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+				// FROM personnel p
+				// LEFT JOIN department d ON (d.id = p.departmentID) 
+				// LEFT JOIN location l ON (l.id = d.locationID) 
+				// WHERE p.firstName LIKE "%' . $_POST['search'] . '%"
+				// OR p.lastName LIKE "%' . $_POST['search'] . '%"
+				// OR p.email LIKE "%' . $_POST['search'] . '%"
+				// ORDER BY p.lastName, p.firstName, d.name, l.name';
+				// 	} else {
+				// 		$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location 
+				// 					FROM personnel p
+				// 					LEFT JOIN department d ON (d.id = p.departmentID) 
+				// 					LEFT JOIN location l ON (l.id = d.locationID) 
+				// 					WHERE d.id = ' . $_POST['param'] . '
+				// 					AND (p.firstName LIKE "%' . $_POST['search'] . '%"
+				// 					OR p.lastName LIKE "%' . $_POST['search'] . '%"
+				// 					OR p.email LIKE "%' . $_POST['search'] . '%")
+				// 					ORDER BY p.lastName, p.firstName, d.name, l.name';
+				// 	}
+				// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+			case 'update':
+
+				if ($_POST['department'] == '0') {
+					if (filter_var($_POST['data'], FILTER_VALIDATE_EMAIL)) {
+						$query = 'UPDATE personnel
+						SET email = "' . $_POST['data'] . '"
+						WHERE id = "' . $_POST['id'] . '"';
+					} else {
+						exit('Invalid Email Error');
+					}
+				} else {
+					if (filter_var($_POST['data'], FILTER_VALIDATE_EMAIL)) {
+						$query = 'UPDATE personnel
+						SET email = "' . $_POST['data'] . '",
+						departmentID = "' . $_POST['department'] . '"
+						WHERE id = "' . $_POST['id'] . '"';
+					} else {
+						exit('Invalid Email Error');
+					}
+				}
+				break;
+
+			case 'delete':
+				if ($_POST['operation'] == 'delete') {
+					if ($_POST['id'] !== 0) {
+						echo ('id_is' . $_POST['id']);
+						$query = 'DELETE 
+					FROM personnel
+					WHERE id = ' . $_POST['id'];
+					} else {
+						exit('Could Not Delete Person');
+					}
+				}
+				break;
+
+			default:
+				exit('Personnel Data Query Error');
+				break;
+		}
+
+		break;
+
+
+
+	case 'department':
+
+		switch ($_POST['operation']) {
+
+			case 'create':
+				$query = '
+				REPLACE INTO department (name, locationID) VALUES("' . $_POST['name'] . '",' . $_POST["ID"] . ')';
+				break;
+
+			case 'read':
+				if ($_POST['search'] === 'all') {
+					$query = 'SELECT id, name, locationID 
+							FROM department';
+				} else {
+					if ($_POST['param'] === 'person') {
+						$query = 'SELECT * FROM personnel p
+							WHERE p.departmentID = ' . $_POST['search'];
+					} else {
+						$query = 'SELECT * FROM department
+							WHERE locationID = ' . $_POST['search'];
+					}
+				};
+				break;
+
+			case 'update':
+				$query = 'UPDATE department SET name = "' . $_POST['data'] . '" WHERE id = ' . $_POST['id'];
+				break;
+
+			case 'delete':
+				if ($_POST['operation'] == 'delete') {
+					if ($_POST['id'] !== 0) {
+						$query =
+							$query = 'DELETE 
+					FROM department
+					WHERE id = ' . $_POST['id'];
+					} else {
+						exit('Could Not Delete Department');
+					}
+				}
+				break;
+
+			default:
+				exit('Department Data Query Error');
+				break;
 		}
 		break;
 
-	case 'department':
-		if ($_POST['search'] === 'all') {
-			$query = 'SELECT id, name, locationID 
-					FROM department';
-		} else {
-			if ($_POST['param'] == 'person') {
-				$query = 'SELECT * FROM personnel p
-					WHERE p.departmentID = ' . $_POST['search'];
-			} else {
-				$query = 'SELECT * FROM department
-					WHERE locationID = ' . $_POST['search'];
-			}
-		};
-		break;
+
+
 
 	case 'location':
 		if ($_POST['search'] === 'all') {
@@ -99,34 +267,17 @@ switch ($_POST['querytype']) {
 		};
 		break;
 
-	case 'id':
-		$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location, l.id as locid 
-				FROM personnel p 
-				LEFT JOIN department d ON (d.id = p.departmentID) 
-				LEFT JOIN location l ON (l.id = d.locationID)
-				WHERE p.id =' . $_POST['search'];
-		break;
+		// case 'id':
+		// 	$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location, l.id as locid 
+		// 			FROM personnel p 
+		// 			LEFT JOIN department d ON (d.id = p.departmentID) 
+		// 			LEFT JOIN location l ON (l.id = d.locationID)
+		// 			WHERE p.id =' . $_POST['search'];
+		// 	break;
 
-	case 'update':
+		// case 'update':
 
-		if ($_POST['department'] == '0') {
-			if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-				$query = 'UPDATE personnel
-				SET email = "' . $_POST['email'] . '"
-				WHERE id = "' . $_POST['id'] . '"';
-			} else {
-				exit('Invalid Email Error');
-			}
-		} else {
-			if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-				$query = 'UPDATE personnel
-				SET email = "' . $_POST['email'] . '",
-				departmentID = "' . $_POST['department'] . '"
-				WHERE id = "' . $_POST['id'] . '"';
-			} else {
-				exit('Invalid Email Error');
-			}
-		}
+
 
 		// if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) && $_POST['department'] !== '0') {
 		// 	$query = 'UPDATE personnel
@@ -143,75 +294,73 @@ switch ($_POST['querytype']) {
 		// 	exit('Invalid Email Error');
 		// }
 
-		break;
 
-	case 'delete':
-		if ($_POST['operation'] == 'delete') {
-			switch ($_POST['data']) {
-				case 'id':
 
-					if ($_POST['id'] !== 0) {
-						echo ('id_is' . $_POST['id']);
-						$query = 'DELETE 
-						FROM personnel
-						WHERE id = ' . $_POST['id'];
-					} else {
-						exit('Could Not Delete Person');
-					}
-					break;
+		// case 'delete':
+		// 	if ($_POST['operation'] == 'delete') {
+		// 		switch ($_POST['data']) {
+		// 			case 'person':
 
-				case 'department':
-					if ($_POST['department'] !== 0) {
-						$query =
-							'DELETE 
-						FROM personnel
-						WHERE id = "' . $_POST['id'] . '",' .
-							$_POST['department'] . 'NOT IN 
-						(SELECT departmentID FROM personnel)';
-					} else {
-						exit('Could Not Delete Department');
-					}
-					break;
+		// 				if ($_POST['id'] !== 0) {
+		// 					echo ('id_is' . $_POST['id']);
+		// 					$query = 'DELETE 
+		// 					FROM personnel
+		// 					WHERE id = ' . $_POST['id'];
+		// 				} else {
+		// 					exit('Could Not Delete Person');
+		// 				}
+		// 				break;
 
-				case 'location':
-					# code...
-					break;
+		// 			case 'department':
+		// 				if ($_POST['id'] !== 0) {
+		// 					$query =
+		// 						$query = 'DELETE 
+		// 					FROM department
+		// 					WHERE id = ' . $_POST['id'];
+		// 				} else {
+		// 					exit('Could Not Delete Department');
+		// 				}
+		// 				break;
 
-				default:
-					exit('Delete Not Possible');
-					break;
-			}
-		}
-		break;
+		// 			case 'location':
+		// 				# code...
+		// 				break;
 
-	case 'create':
-		switch ($_POST['table']) {
-			case 'personnel':
+		// 			default:
+		// 				exit('Delete Not Possible');
+		// 				break;
+		// 		}
+		// 	}
+		// 	break;
 
-				$jobTitle = "";
-				// $newID = $conn->query('SELECT MAX(id) + 1 FROM personnel');
+		// case 'create':
+		// 	switch ($_POST['table']) {
+		// 		case 'personnel':
 
-				$query = 'INSERT INTO personnel (firstName, lastName, jobTitle, email, departmentID, id) 
-				SELECT "' . $_POST['firstName'] . '","' . $_POST['lastName'] . '","' . $jobTitle . '","' . $_POST['email'] . '","' . $_POST['departmentID'] .
-					'", MAX(id) + 1 FROM personnel';
+		// 			$jobTitle = "";
+		// 			// $newID = $conn->query('SELECT MAX(id) + 1 FROM personnel');
 
-				break;
+		// 			$query = 'INSERT INTO personnel (firstName, lastName, jobTitle, email, departmentID, id) 
+		// 			SELECT "' . $_POST['name'] . '","' . $_POST['lastName'] . '","' . $jobTitle . '","' . $_POST['email'] . '","' . $_POST['ID'] .
+		// 				'", MAX(id) + 1 FROM personnel';
 
-			case 'department':
-				# code...
-				break;
-			case 'location':
-				# code...
-				break;
-			default:
-				# code...
-				break;
-		}
+		// 			break;
+
+		// 		case 'department':
+		// 			# code...
+		// 			break;
+		// 		case 'location':
+		// 			# code...
+		// 			break;
+		// 		default:
+		// 			# code...
+		// 			break;
+		// 	}
 
 
 
 
-		break;
+		// 	break;
 
 	default:
 		exit('Invalid Database Query');
@@ -273,6 +422,7 @@ if ($_POST['operation'] == 'read') {
 	}
 
 	if ($_POST['operation'] == 'update') {
+		echo ("uploading photo");
 		while (true) {
 			if (file_exists("../../images/uploads/staffphoto_temp.jpg")) {
 				rename("../../images/uploads/staffphoto_temp.jpg", "../../images/staffpics/staffphoto_id" . $_POST['id'] . ".jpg");
