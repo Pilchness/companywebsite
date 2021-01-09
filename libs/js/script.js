@@ -1,16 +1,12 @@
+//Database Functions Main Code - CRUD
+//**************************************************************************/
+//
 class DatabaseQuery {
   constructor(querytype) {
     this.querytype = querytype;
   }
 
-  createData = async (
-    name,
-    lastName = '',
-    email = '',
-    ID = '',
-    placeholder = ''
-  ) => {
-    console.log('creatingdata:' + name, lastName, email, ID, placeholder);
+  createData = async (name, lastName = '', email = '', ID = '', placeholder = '') => {
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -36,7 +32,6 @@ class DatabaseQuery {
   };
 
   readData = async (search, param = 0) => {
-    console.log('readingdata:' + this.querytype, search, param);
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -49,7 +44,6 @@ class DatabaseQuery {
           param: param
         },
         success: function (result) {
-          console.log(result);
           resolve(result.data);
         },
         error: function (error) {
@@ -96,14 +90,23 @@ class DatabaseQuery {
         },
         success: function (result) {
           resolve(result);
+          console.log(result);
         },
         error: function (error) {
           reject(error);
+          console.log(error);
         }
       });
     });
   };
 }
+
+//Global Variables and Functions
+//**************************************************************************/
+//
+const personnelDirectoryQuery = new DatabaseQuery('personnel');
+const departmentDirectoryQuery = new DatabaseQuery('department');
+const locationDirectoryQuery = new DatabaseQuery('location');
 
 let visibleSearch = false;
 let marginTop = ['162px', '198px'];
@@ -132,56 +135,80 @@ const removeSearchBar = () => {
   visibleSearch = false;
 };
 
-const messageDisplay = (error, color = 'red') => {
-  console.log(error, color);
+const messageDisplay = (displayMessage, color = 'red', afterRemoval, param) => {
   if ($('#main-content-header').length) {
     $('#main-content-header').append(
-      `<span id="error" style="color: ${color}">${error.responseText}</span><br>`
+      `<div id="display-message"><span style="color: ${color}">${displayMessage.responseText}</span><br></div>`
     );
-    $(document).on('click', function () {
-      $('#error').remove();
-    });
+    const remove = () => {
+      $('#display-message').remove();
+      if (afterRemoval) {
+        param ? afterRemoval(param) : afterRemoval();
+      }
+      $(document).off('click', remove);
+    };
+    $(document).on('click', remove);
   }
 };
 
+//Change page layout to enable some pages to scroll and others to be static
 const changePageLayout = (changeTo) => {
   $('#main-content').length ? (changeFrom = 'main') : (changeFrom = 'page');
-  $(`#${changeFrom}-content`).replaceWith(
-    `<div id="${changeTo}-content"></div>`
-  );
+  $(`#${changeFrom}-content`).replaceWith(`<div id="${changeTo}-content"></div>`);
   scrollReset();
   removeSearchBar();
 };
 
-const shortenDepartmentString = (departmentName, max) => {
-  let departmentTextString = departmentName;
+const shortenString = (string, max) => {
+  let textString = string;
   let maxLength = max;
-  if (departmentTextString.length > maxLength) {
-    departmentTextString = departmentTextString.substr(0, maxLength) + '...';
+  if (textString.length > maxLength) {
+    textString = textString.substr(0, maxLength) + '...';
   }
-  return departmentTextString;
+  return textString;
 };
 
-const personnelDirectoryQuery = new DatabaseQuery('personnel');
-const departmentDirectoryQuery = new DatabaseQuery('department');
-const locationDirectoryQuery = new DatabaseQuery('location');
+//
+//<<<<<<<< Input Validation >>>>>>>>
+//
+const emailValidate = new RegExp(
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+);
+const nameValidate = new RegExp(`^[a-zA-Z'\-\pL]+(?:(?! {2})[a-zA-Z'\-\pL ])*[a-zA-Z'\-\pL]+$`);
 
-const updateProfileDepartmentList = async (location = 'all', department) => {
+const handleEmailInput = (email) => {
+  $('#email-info').replaceWith(
+    `<label id="email-label">Email: </label> <input id="email-input" 
+    style="width: 14em" value="${email}" spellcheck="false"></input>`
+  );
+  $('#email-input').on('keyup', function () {
+    if (emailValidate.test($(this).val())) {
+      $('#confirm-changes').removeAttr('disabled');
+    } else {
+      $('#confirm-changes').attr('disabled', true);
+    }
+  });
+};
+
+//Onboard Page Functions
+//**************************************************************************/
+//
+//
+//<<<<<<<< Onboard Input Logic and Validation>>>>>>>>
+//
+const updateProfiledisplayDepartmentList = async (location = 'all', department) => {
   departmentDirectoryQuery
     .readData(location, 'location')
     .then((response) => {
       response.forEach((dept) => {
         if (dept.name !== department) {
           $('#department-selector').append(
-            `<option value="${dept.id}">${shortenDepartmentString(
-              dept.name,
-              20
-            )}</option>`
+            `<option value="${dept.id}">${shortenString(dept.name, 20)}</option>`
           );
         }
       });
     })
-    .catch((error) => {
+    .catch(() => {
       messageDisplay(
         {
           responseText: 'Profile Update Error'
@@ -197,13 +224,11 @@ const createLocationDropdown = async (location) => {
     .then((response) => {
       response.forEach((loc) => {
         if (loc.name !== location) {
-          $('#location-selector').append(
-            `<option value="${loc.id}">${loc.name}</option>`
-          );
+          $('#location-selector').append(`<option value="${loc.id}">${loc.name}</option>`);
         }
       });
     })
-    .catch((error) => {
+    .catch(() => {
       messageDisplay(
         {
           responseText: 'Error Getting Locations'
@@ -219,61 +244,16 @@ const updateLocationAndDepartmentSelectors = (locid, department) => {
     $('#department-selector').empty();
     if (selectedLocation === '0') {
       $('#department-selector').append(
-        `<option id="current-department" value="0" selected>${shortenDepartmentString(
+        `<option id="current-department" value="0" selected>${shortenString(
           department,
           10
         )} (current)</option>`
       );
-      updateProfileDepartmentList(locid, department);
+      updateProfiledisplayDepartmentList(locid, department);
     } else {
-      updateProfileDepartmentList(selectedLocation, department);
+      updateProfiledisplayDepartmentList(selectedLocation, department);
     }
   });
-};
-
-const emailValidate = new RegExp(
-  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-);
-
-const nameValidate = new RegExp(
-  `^[a-zA-Z'\-\pL]+(?:(?! {2})[a-zA-Z'\-\pL ])*[a-zA-Z'\-\pL]+$`
-);
-
-const handleEmailInput = (email) => {
-  $('#email-info').replaceWith(
-    `<label id="email-label">Email: </label> <input id="email-input" style="width: 14em" value="${email}" spellcheck="false"></input>`
-  );
-  $('#email-input').on('keyup', function () {
-    if (emailValidate.test($(this).val())) {
-      $('#confirm-changes').removeAttr('disabled');
-    } else {
-      $('#confirm-changes').attr('disabled', true);
-    }
-  });
-};
-
-const addNewPersonToDatabase = async (
-  firstName,
-  lastName,
-  email,
-  department,
-  placeholder
-) => {
-  try {
-    personnelDirectoryQuery
-      .createData(firstName, lastName, email, department, placeholder)
-      .then((response) => {
-        console.log(response);
-        messageDisplay(
-          {
-            responseText: `${firstName} ${lastName} added successfully.`
-          },
-          'green'
-        );
-      });
-  } catch {
-    (error) => console.log(error);
-  }
 };
 
 const handleOnboardInput = () => {
@@ -316,18 +296,15 @@ const handleOnboardInput = () => {
 const authenticateFileType = () => {
   $('#file').change(function () {
     uploadPhoto = window.URL.createObjectURL(this.files[0]);
-    console.log(this.files[0].type);
     if (this.files[0].type === 'image/jpeg') {
-      console.log('correct file type', this.files[0].type);
       $('.card-img-top').attr('src', uploadPhoto);
     } else {
       if (this.files[0].type !== 'image/jpeg') {
         $('#confirm-changes, #new-onboard').attr('disabled', true);
-        console.log('wrong file type', this.files[0].type);
         $('.custom-file-input').text('Invalid File');
         messageDisplay(
           {
-            responseText: 'Wrong type of file'
+            responseText: 'Wrong type of file.'
           },
           'red'
         );
@@ -336,6 +313,9 @@ const authenticateFileType = () => {
   });
 };
 
+//Dashboard Page Main Code
+//**************************************************************************/
+//
 const loadDashboard = () => {
   changePageLayout('main');
   toggleScroll(true);
@@ -386,12 +366,8 @@ const loadDashboard = () => {
         });
       }
       $(`#message-close${messageIndex}`).on('click', function () {
-        const index = messageIndex;
-        console.log(index);
-        console.table(notificationArray);
-        notificationArray = notificationArray
-          .slice(0, index - 1)
-          .concat(notificationArray.slice(index, notificationArray.length));
+        const index = this.id.charAt(this.id.length - 1);
+        notificationArray.splice(index, 1);
         loadDashboard();
       });
       messageIndex++;
@@ -400,137 +376,13 @@ const loadDashboard = () => {
   updateMessages();
 };
 
-const checkDepartmentDelete = (dept) => {
-  console.log(dept);
-  let deptCheck = true;
-  personnelDirectoryQuery.readData('all').then((response) => {
-    response.forEach((person) => {
-      if (person.department === dept) {
-        deptCheck = false;
-      }
-    });
-  });
-  return deptCheck;
-};
-
-const handleSettingsButton = async (table, action, ID) => {
-  if (table === 'error') {
-    messageDisplay(
-      {
-        responseText: 'Invalid Option Selected'
-      },
-      'red'
-    );
-  } else {
-    console.log('table: ' + table + ' action: ' + action + ' ID: ' + ID);
-    if (table === 'department') {
-      if (ID !== 0) {
-        let selectedDepartment = $(
-          '#department-edit-select option:selected'
-        ).text();
-        switch (action) {
-          case 'delete':
-            if (checkDepartmentDelete(selectedDepartment)) {
-              departmentDirectoryQuery.deleteData(table, ID);
-            } else {
-              $('#main-content-header')
-                .append(`<div id="delete-department-warning" class="alert alert-danger" role="alert">
-        You are attempting to remove ${selectedDepartment} which still has staff assigned to it. 
-        If you really want to delete ${selectedDepartment}, you must reassign all its staff or offboard them first.
-        </div>`);
-              $('#delete-department-warning').alert();
-              $('#delete-department-warning').on('click', function (e) {
-                $('#delete-department-warning').remove();
-                e.stopPropagation();
-              });
-            }
-            break;
-
-          case 'edit':
-            $('#department-edit-select').replaceWith(`
-          <input id="department-edit-name" style="width: 14em" value="${selectedDepartment}" spellcheck="false"></input>`);
-            $('#delete-department').attr('disabled', true);
-            $('#add-department').attr('disabled', true);
-            $('#edit-department').replaceWith(` 
-          <button type="button" id="confirm-edit-department" class="btn btn-success settings-button" >Confirm</button>`);
-            $('#department-edit-name').on('keyup', function () {
-              if ($(this).val().length < 2 || $(this).val().length > 25) {
-                $('#confirm-edit-department').attr('disabled', true);
-              } else $('#confirm-edit-department').removeAttr('disabled');
-            });
-            $('#confirm-edit-department').on('click', function () {
-              console.log(
-                'renaming ' +
-                  selectedDepartment +
-                  ' to ' +
-                  $('#department-edit-name').val()
-              );
-              try {
-                departmentDirectoryQuery
-                  .updateData(ID, $('#department-edit-name').val())
-                  .then((response) => {
-                    console.log(response);
-                  });
-              } catch {}
-            });
-
-            break;
-
-          case 'add':
-            $('#department-edit-select').replaceWith(`
-            <div style="display: flex; flex-direction: row; align-items: flex-end"><input id="department-new-name" style="width: 10em; height: 40px" placeholder="New Department" spellcheck="false"></input>
-            <div style="display: flex; flex-direction: column"><label style="height: 10px; font-size: 10px" class="form-label" for="location-selector">New Dept Location</label>
-            <select style="flex: 1; border-radius: 5px; height: 30px" class="custom-select add" id="location-selector"></select></div></div>
-            `);
-            createLocationDropdown();
-            $('#delete-department').attr('disabled', true);
-            $('#edit-department').attr('disabled', true);
-            $('#add-department').replaceWith(` 
-            <button type="button" id="confirm-new-department" class="btn btn-success settings-button" >Confirm</button>`);
-            $('#department-new-name').on('keyup', function () {
-              if ($(this).val().length < 2 || $(this).val().length > 25) {
-                $('#confirm-new-department').attr('disabled', true);
-              } else $('#confirm-new-department').removeAttr('disabled');
-            });
-            $('#confirm-new-department').on('click', function () {
-              console.log('creating ' + $('#department-new-name').val());
-              departmentDirectoryQuery
-                .createData($('#department-new-name').val(), '', '', 3)
-                .then((response) => {
-                  console.log(response.status);
-                  if (response.status.code == 200) {
-                    console.log(
-                      $('#department-new-name').val() + ' created successfully'
-                    );
-                    messageDisplay(
-                      {
-                        responseText: `${$(
-                          '#department-new-name'
-                        ).val()} created successfully`
-                      },
-                      'green'
-                    );
-                  }
-                });
-            });
-            break;
-
-          default:
-            return;
-            break;
-        }
-      }
-    } else if (table === 'location') {
-    }
-  }
-};
-
+//Settings Page Main Code
+//**************************************************************************/
+//
 const loadSettings = () => {
   scrollReset();
   changePageLayout('page');
   $('#personnel-button-container').remove();
-
-  //$('#main-content-header').remove();
   $('#page-content').append(
     `<div id="settings-container">
     <h2>General Settings</h2>
@@ -546,7 +398,8 @@ const loadSettings = () => {
   <div id="edit-departments-button-group" class="btn-group" role="group" aria-label="edit departments">
   <button type="button" id="delete-department" class="btn btn-danger settings-button" disabled>Delete</button>
   <button type="button" id="edit-department" class="btn btn-warning settings-button" disabled>Edit</button>
-  <button id="add-department" type="button" class="btn btn-secondary settings-button" >Add New</button>
+  <button id="add-department" type="button" class="btn btn-primary settings-button" >Add New</button>
+  <button id="cancel-department" type="button" class="btn btn-secondary settings-button" >Cancel</button>
 </div>
   <br>
   <br>
@@ -560,13 +413,13 @@ const loadSettings = () => {
   <div id="edit-locations-button-group" class="btn-group" role="group" aria-label="edit locations">
   <button type="button" id="delete-location" class="btn btn-danger settings-button" disabled>Delete</button>
   <button type="button" id="edit-location" class="btn btn-warning cancel settings-button" disabled>Edit</button>
-  <button id="add-location" type="button" class="btn btn-secondary settings-button">Add New</button>
+  <button id="add-location" type="button" class="btn btn-primary settings-button">Add New</button>
+  <button id="cancel-location" type="button" class="btn btn-secondary settings-button" >Cancel</button>
 </div>
 </div>`
   );
   populateDepartmentSelector(false);
   $('#department-edit-select').on('change', function () {
-    console.log($(this).val());
     if ($(this).val() === 0) {
       $('#delete-department').attr('disabled', true);
       $('#edit-department').attr('disabled', true);
@@ -576,6 +429,15 @@ const loadSettings = () => {
     }
   });
   populateLocationSelector();
+  $('#location-edit-select').on('change', function () {
+    if ($(this).val() === 0) {
+      $('#delete-location').attr('disabled', true);
+      $('#edit-location').attr('disabled', true);
+    } else {
+      $('#delete-location').removeAttr('disabled');
+      $('#edit-location').removeAttr('disabled');
+    }
+  });
   $('.settings-button').on('click', function () {
     switch ($(this).attr('id')) {
       case 'delete-department':
@@ -607,18 +469,10 @@ const loadSettings = () => {
         );
         break;
       case 'edit-location':
-        handleSettingsButton(
-          'location',
-          'edit',
-          $('#location-edit-select option:selected').val()
-        );
+        handleSettingsButton('location', 'edit', $('#location-edit-select option:selected').val());
         break;
       case 'add-location':
-        handleSettingsButton(
-          'location',
-          'add',
-          $('#location-edit-select option:selected').val()
-        );
+        handleSettingsButton('location', 'add', $('#location-edit-select option:selected').val());
         break;
 
       default:
@@ -628,6 +482,249 @@ const loadSettings = () => {
   });
 };
 
+//Settings Page Functions
+//**************************************************************************/
+//
+
+const checkDepartmentDelete = async (dept) => {
+  let deptCheck = true;
+  personnelDirectoryQuery.readData('all').then((response) => {
+    response.forEach((person) => {
+      if (person.department === dept) {
+        deptCheck = false;
+      }
+    });
+  });
+  return deptCheck;
+};
+
+const checkLocationDelete = async (loc) => {
+  let locCheck = true;
+  personnelDirectoryQuery.readData('all').then((response) => {
+    console.log(response);
+    response.forEach((person) => {
+      if (person.location === loc) {
+        locCheck = false;
+      }
+    });
+  });
+  console.log(locCheck);
+  return false;
+};
+
+const handleSettingsButton = async (table, action, ID) => {
+  if (table === 'error') {
+    messageDisplay(
+      {
+        responseText: 'Invalid Option Selected'
+      },
+      'red'
+    );
+  } else {
+    if (table === 'department') {
+      if (ID !== 0) {
+        let selectedDepartment = $('#department-edit-select option:selected').text();
+        switch (action) {
+          case 'delete':
+            if (checkDepartmentDelete(selectedDepartment)) {
+              departmentDirectoryQuery.deleteData(table, ID);
+            } else {
+              $('#main-content-header')
+                .append(`<div id="delete-department-warning" class="alert alert-danger" role="alert">
+        You are attempting to remove ${selectedDepartment} which still has staff assigned to it. 
+        If you really want to delete ${selectedDepartment}, you must reassign all its staff or offboard them first.
+        </div>`);
+              $('#delete-department-warning').alert();
+              $('#delete-department-warning').on('click', function (e) {
+                $('#delete-department-warning').remove();
+                e.stopPropagation();
+              });
+            }
+            break;
+
+          case 'edit':
+            $('#department-edit-select').replaceWith(`
+          <input id="department-edit-name" style="width: 14em" value="${selectedDepartment}" spellcheck="false"></input>`);
+            $('#delete-department').attr('disabled', true);
+            $('#add-department').attr('disabled', true);
+            $('#edit-department').replaceWith(` 
+          <button type="button" id="confirm-edit-department" class="btn btn-success settings-button" >Confirm</button>`);
+            $('#department-edit-name').on('keyup', function () {
+              if ($(this).val().length < 2 || $(this).val().length > 25) {
+                $('#confirm-edit-department').attr('disabled', true);
+              } else $('#confirm-edit-department').removeAttr('disabled');
+            });
+            $('#confirm-edit-department').on('click', function () {
+              try {
+                departmentDirectoryQuery
+                  .updateData(ID, $('#department-edit-name').val())
+                  .then((response) => {
+                    messageDisplay(
+                      {
+                        responseText: `${$('#department-edit-name').val()} changed successfully`
+                      },
+                      'green'
+                    );
+                  });
+              } catch {
+                () => {
+                  messageDisplay(
+                    {
+                      responseText: `Could not edit department.`
+                    },
+                    'red'
+                  );
+                };
+              }
+            });
+            break;
+
+          case 'add':
+            $('#department-edit-select').replaceWith(`
+            <div style="display: flex; flex-direction: row; align-items: flex-end"><input id="department-new-name" style="width: 10em; height: 40px" placeholder="New Department" spellcheck="false"></input>
+            <div style="display: flex; flex-direction: column"><label style="height: 10px; font-size: 10px" class="form-label" for="location-selector">New Dept Location</label>
+            <select style="flex: 1; border-radius: 5px; height: 30px" class="custom-select add" id="location-selector"></select></div></div>
+            `);
+            createLocationDropdown();
+            $('#delete-department').attr('disabled', true);
+            $('#edit-department').attr('disabled', true);
+            $('#add-department').replaceWith(` 
+            <button type="button" id="confirm-new-department" class="btn btn-success settings-button" >Confirm</button>`);
+            $('#department-new-name').on('keyup', function () {
+              if ($(this).val().length < 2 || $(this).val().length > 25) {
+                $('#confirm-new-department').attr('disabled', true);
+              } else $('#confirm-new-department').removeAttr('disabled');
+            });
+            $('#confirm-new-department').on('click', function () {
+              departmentDirectoryQuery
+                .createData($('#department-new-name').val(), '', '', $('#location-selector').val())
+                .then((response) => {
+                  if (response.status.code == 200) {
+                    messageDisplay(
+                      {
+                        responseText: `${$('#department-new-name').val()} created successfully`
+                      },
+                      'green'
+                    );
+                  }
+                });
+            });
+            break;
+
+          default:
+            messageDisplay(
+              {
+                responseText: `Unexplained data error.`
+              },
+              'red'
+            );
+        }
+      }
+    } else if (table === 'location') {
+      if (ID !== 0) {
+        let selectedLocation = $('#location-edit-select option:selected').text();
+        switch (action) {
+          case 'delete':
+            if (checkLocationDelete(selectedLocation)) {
+              locationDirectoryQuery.deleteData(table, ID);
+            } else {
+              $('#main-content-header')
+                .append(`<div id="delete-location-warning" class="alert alert-danger" role="alert">
+        You are attempting to remove ${selectedLocation} which still has staff assigned to it. 
+        If you really want to delete ${selectedLocation}, you must reassign all its staff or offboard them first.
+        </div>`);
+              $('#delete-location-warning').alert();
+              $('#delete-location-warning').on('click', function (e) {
+                $('#delete-location-warning').remove();
+                e.stopPropagation();
+              });
+            }
+            break;
+
+          case 'edit':
+            $('#location-edit-select').replaceWith(`
+          <input id="location-edit-name" style="width: 14em" value="${selectedLocation}" spellcheck="false"></input>`);
+            $('#delete-location').attr('disabled', true);
+            $('#add-location').attr('disabled', true);
+            $('#edit-location').replaceWith(` 
+          <button type="button" id="confirm-edit-location" class="btn btn-success settings-button" >Confirm</button>`);
+            $('#location-edit-name').on('keyup', function () {
+              if ($(this).val().length < 2 || $(this).val().length > 25) {
+                $('#confirm-edit-location').attr('disabled', true);
+              } else $('#confirm-edit-location').removeAttr('disabled');
+            });
+            $('#confirm-edit-location').on('click', function () {
+              try {
+                locationDirectoryQuery
+                  .updateData(ID, $('#location-edit-name').val())
+                  .then((response) => {
+                    messageDisplay(
+                      {
+                        responseText: `${$('#location-edit-name').val()} changed successfully`
+                      },
+                      'green'
+                    );
+                  });
+              } catch {
+                () => {
+                  messageDisplay(
+                    {
+                      responseText: `Could not edit location.`
+                    },
+                    'red'
+                  );
+                };
+              }
+            });
+            break;
+
+          case 'add':
+            $('#location-edit-select').replaceWith(`
+            <div style="display: flex; flex-direction: row; align-items: flex-end">
+            <input id="location-new-name" style="width: 10em; height: 40px" placeholder="New location" spellcheck="false"></input>
+            `);
+            createLocationDropdown();
+            $('#delete-location').attr('disabled', true);
+            $('#edit-location').attr('disabled', true);
+            $('#add-location').replaceWith(` 
+            <button type="button" id="confirm-new-location" class="btn btn-success settings-button" >Confirm</button>`);
+            $('#location-new-name').on('keyup', function () {
+              if ($(this).val().length < 2 || $(this).val().length > 25) {
+                $('#confirm-new-location').attr('disabled', true);
+              } else $('#confirm-new-location').removeAttr('disabled');
+            });
+            $('#confirm-new-location').on('click', function () {
+              locationDirectoryQuery
+                .createData($('#location-new-name').val(), '', '', 3)
+                .then((response) => {
+                  if (response.status.code == 200) {
+                    messageDisplay(
+                      {
+                        responseText: `${$('#location-new-name').val()} created successfully`
+                      },
+                      'green'
+                    );
+                  }
+                });
+            });
+            break;
+
+          default:
+            messageDisplay(
+              {
+                responseText: `Unexplained data error.`
+              },
+              'red'
+            );
+        }
+      }
+    }
+  }
+};
+
+//Reports Page Main Code
+//**************************************************************************/
+//
 const loadReportsPage = async () => {
   scrollReset();
   changePageLayout('page');
@@ -643,7 +740,6 @@ const loadReportsPage = async () => {
     .readData('all')
     .then((response) => {
       staffdata = response;
-      console.log(staffdata);
       const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
       alphabet.forEach((letter) => {
         let lettercount = 0;
@@ -660,7 +756,6 @@ const loadReportsPage = async () => {
       initialcount.sort(function (a, b) {
         return b[1] - a[1];
       });
-      console.log(initialcount);
       initialReportList = () => {
         let reportListCode = '';
         for (let i = 0; i < initialReportNumber; i++) {
@@ -677,17 +772,13 @@ const loadReportsPage = async () => {
       departmentDirectoryQuery
         .readData('all')
         .then((response) => {
-          console.log(response);
           departmentdata = response;
-          console.log(departmentdata);
           departmentdata.forEach((department) => {
             let departmentcount = 0;
             staffdata.forEach((person) => {
-              //console.log(person.department, department)
               if (person.department === department.name) {
                 departmentcount++;
               }
-              //console.log(departmentcount);
             });
             if (departmentcount > largestdepartment[1]) {
               largestdepartment = [department.name, departmentcount];
@@ -704,17 +795,11 @@ const loadReportsPage = async () => {
               $('#page-content').append(
                 `<div id="report-container">
           <p class="body-text">
-            There are currently <strong>${
-              staffdata.length
-            }</strong> employees at Global Unity, 
+            There are currently <strong>${staffdata.length}</strong> employees at Global Unity, 
             working in <strong>${departmentdata.length}</strong> departments
-            over <strong>${
-              locationdata.length
-            }</strong> locations across the world.
+            over <strong>${locationdata.length}</strong> locations across the world.
           </p>
-          <p class="body-text">The largest department is <strong>${
-            largestdepartment[0]
-          }</strong> 
+          <p class="body-text">The largest department is <strong>${largestdepartment[0]}</strong> 
           with <strong>${largestdepartment[1]}</strong> employees.</p>
           <p class="body-text">Out of the ${
             staffdata.length
@@ -728,6 +813,9 @@ const loadReportsPage = async () => {
     });
 };
 
+//Photo Upload Functions
+//**************************************************************************/
+//
 let placeholder = 'false';
 let uploadPhoto;
 
@@ -735,7 +823,6 @@ const addNewPhoto = (id) => {
   $('#new-onboard, #confirm-changes').click(function () {
     let fd = new FormData();
     let files = $('#file')[0].files;
-    console.log(files);
     if (files.length < 0) {
       if (id) {
         files = `images/staffphoto_id${id}.jpg`;
@@ -751,23 +838,21 @@ const addNewPhoto = (id) => {
         processData: false,
         success: function (response) {
           if (response != 0) {
-            // clearCache = function (reloadAfterClear = true) {
-            //   if ('caches' in window) {
-            //     caches.keys().then((names) => {
-            //       names.forEach(async (name) => {
-            //         await caches.delete(name);
-            //       });
-            //     });
-            //     if (reloadAfterClear) window.location.reload();
-            //   }
-            // };
-            // clearCache();
-            //console.log($('.custom-file-input').attr('name'));
-            // window.name = id;
-            //location.reload();
-            //loadPersonnelPage();
+            messageDisplay(
+              {
+                responseText: `Photo uploaded successfully.`
+              },
+              'green'
+            );
           } else {
             placeholder = 'true';
+            messageDisplay(
+              {
+                responseText: `Photo could not be uploaded.`
+              },
+              'green',
+              loadPersonnelPage
+            );
           }
         }
       });
@@ -777,7 +862,11 @@ const addNewPhoto = (id) => {
   });
 };
 
-const photoUploadForm = `    <form method="post" action="" enctype="multipart/form-data" id="myform">
+//Onboard Page Main Code
+//**************************************************************************/
+//
+
+const photoUploadForm = `<form method="post" action="" enctype="multipart/form-data" id="myform">
 <div class="custom-file">
   <img src="images/icons/placeholder.jpg" class="card-img-top" id="preview-image"/>
   <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
@@ -792,60 +881,61 @@ const loadOnboardPage = () => {
   changePageLayout('page');
   $('#page-content').append(
     `<div id="onboard-form">
-  <div id="form-container">
-    <p id="onboard-paragraph" class="body-text">
-      To add a new person to the database, complete their details below and then
-      click the <strong>Add Employee</strong> button.
-    </p>
-    <div>
-
-      <div class="form-group">
-        <label class="form-label" for="onboard-first-name">First Name</label>
-        <input type="text" class="form-control" id="onboard-first-name" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="onboard-last-name">Last Name</label>
-        <input type="text" class="form-control" id="onboard-last-name" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="onboard-email">Email</label>
-        <input type="email" class="form-control" id="onboard-email" />
-      </div>
+    <div id="form-container">
+      <p id="onboard-paragraph" class="body-text">
+        To add a new person to the database, complete their details below and then click the
+        <strong>Add Employee</strong> button.
+      </p>
       <div>
-        <label class="form-label" for="location-selector">Location</label>
-        <br>
-        <select style="flex: 1; border-radius: 5px" class="custom-select add" id="location-selector"></select>
+        <div class="form-group">
+          <label class="form-label" for="onboard-first-name">First Name</label>
+          <input type="text" class="form-control" id="onboard-first-name" spellcheck="false"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="onboard-last-name">Last Name</label>
+          <input type="text" class="form-control" id="onboard-last-name" spellcheck="false"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="onboard-email">Email</label>
+          <input type="email" class="form-control" id="onboard-email" spellcheck="false"/>
+        </div>
+        <div>
+          <label class="form-label" for="location-selector">Location</label>
+          <br />
+          <select
+            style="flex: 1; border-radius: 5px"
+            class="custom-select add"
+            id="location-selector"
+          ></select>
+        </div>
+        <div>
+          <label class="form-label" for="department-selector">Department</label>
+          <br />
+          <select
+            style="flex: 1; border-radius: 5px"
+            class="custom-select add"
+            id="department-selector"
+          ></select>
+        </div>
+        ${photoUploadForm}
       </div>
-      <div>
-        <label class="form-label" for="department-selector">Department</label>
-        <br>
-        <select style="flex: 1; border-radius: 5px" class="custom-select add" id="department-selector"></select>
-      </div>
-
-  ${photoUploadForm}
-  </div>
-</div></div>`
+    </div>
+  </div>`
   );
   createLocationDropdown();
-  updateProfileDepartmentList(1, 1);
+  updateProfiledisplayDepartmentList(1, 1);
   updateLocationAndDepartmentSelectors();
   handleOnboardInput();
   authenticateFileType();
   addNewPhoto();
   $('#new-onboard').on('click', function () {
-    addNewPersonToDatabase(
+    createPersonnelRecord(
       $('#onboard-first-name').val(),
       $('#onboard-last-name').val(),
       $('#onboard-email').val(),
       $('#department-selector option:selected').val(),
       placeholder
     ).then(() => {
-      messageDisplay(
-        {
-          responseText: `Employee successfully added.`
-        },
-        'green'
-      );
       $('#new-onboard').attr('disabled', true);
       $('#onboard-first-name').val(''),
         $('#onboard-last-name').val(''),
@@ -855,13 +945,76 @@ const loadOnboardPage = () => {
   scrollReset();
 };
 
-const mainDirectory = async (search, department) => {
-  console.log(search, department);
+//Directory Search Page Main Code
+//**************************************************************************/
+//
+const loadPersonnelPage = () => {
+  changePageLayout('main');
+  toggleScroll(true);
+  if (!$('#personnel-button-container').length) {
+    $('#main-content-header').append(`
+      <div id="personnel-button-container" class="nav nav-tabs">
+      <button id="directory" class="personnel-button"><h3>Directory</h3></button>
+      <button id="departments" class="personnel-button"><h3>Teams</h3></button>
+      <button id="locations" class="personnel-button"><h3>Locations</h3></button>
+      <img id="search-icon" src='images/icons/search.png'alt='search database' width='20px' height='20px'/>
+      </div>`);
+  }
+  $('#search-icon').on('click', function () {
+    toggleSearchBar();
+  });
+
+  const loadPersonnelTab = (tab) => {
+    switch (tab) {
+      case 'directory':
+        $('#directory').focus();
+        $('#main-content').html(`<ul id="main-directory" class="directory-content"></ul>`);
+        $('.directory-content').css('margin-top', marginTop[0]);
+        displayPersonnelList('all');
+        $('#search-icon').removeAttr('disabled');
+        break;
+
+      case 'departments':
+        $('#departments').focus();
+        $('#main-content').html(`<ul id="department-list" class="directory-content"></ul>`);
+        displayDepartmentList('all');
+        //removeSearchBar();
+        //$('#search-icon').attr('disabled', true);
+        break;
+
+      case 'locations':
+        $('#locations').focus();
+        $('#main-content').html(`<ul id="location-list" class="directory-content"></ul>`);
+        displayLocationList('all');
+        //removeSearchBar();
+        //$('#search-icon').attr('disabled', true);
+        break;
+
+      default:
+        return;
+    }
+    toggleScroll(true);
+    scrollReset();
+  };
+
+  loadPersonnelTab('directory');
+
+  $('.personnel-button').on('click', function () {
+    loadPersonnelTab($(this).attr('id'));
+    $('.directory-content').css('margin-top', marginTop[0]);
+  });
+};
+//Directory Search Page Functions
+//**************************************************************************/
+//
+//
+//<<<<<<<< PERSONNEL TAB >>>>>>>>
+//
+const displayPersonnelList = async (search, department) => {
   $('#main-directory').empty();
   personnelDirectoryQuery
     .readData(search, department)
     .then((response) => {
-      console.log(response);
       response.forEach((person) => {
         $('#main-directory')
           .append(`<div class="card directory-card border-dark mb-1" style="max-width: 100%;">
@@ -878,7 +1031,7 @@ const mainDirectory = async (search, department) => {
       });
       scrollReset();
     })
-    .catch((error) => {
+    .catch(() => {
       messageDisplay(
         {
           responseText: 'Staff Listing Error'
@@ -888,10 +1041,23 @@ const mainDirectory = async (search, department) => {
     });
 };
 
-const departmentList = async () => {
+const updatePersonnelList = () => {
+  if ($('#person-file').length) {
+    $('#person-file').remove();
+    $('#main-content').html(`<ul id="main-directory" class="directory-content"></ul>`);
+    $('.directory-content').css('margin-top', marginTop[0]);
+  }
+  displayPersonnelList(
+    $('#name-search').val(),
+    $('#department-search-select option:selected').val()
+  );
+};
+//
+//<<<<<<<< TEAMS (DEPARTMENTS) TAB >>>>>>>>
+//
+const displayDepartmentList = async (search, department) => {
   removeSearchBar();
   departmentDirectoryQuery.readData('all').then((response) => {
-    console.log(response);
     response.forEach((department) => {
       $('#department-list')
         .append(`<div class="card directory-card border-dark mb-1" style="max-width: 100%;">
@@ -926,9 +1092,15 @@ const departmentList = async () => {
   });
 };
 
-const locationList = async () => {
+const updateDepartmentList = () => {
+  //TODO - department list search function
+};
+
+//
+//<<<<<<<< LOCATIONS TAB >>>>>>>>
+//
+const displayLocationList = async () => {
   removeSearchBar();
-  //visibleSearch = false;
   locationDirectoryQuery
     .readData('all')
     .then((response) => {
@@ -953,7 +1125,7 @@ const locationList = async () => {
             });
             scrollReset();
           })
-          .catch((error) => {
+          .catch(() => {
             messageDisplay(
               {
                 responseText: 'Location List Error'
@@ -963,7 +1135,7 @@ const locationList = async () => {
           });
       });
     })
-    .catch((error) => {
+    .catch(() => {
       messageDisplay(
         {
           responseText: 'Location List Error'
@@ -973,12 +1145,19 @@ const locationList = async () => {
     });
 };
 
+const updateLocationList = () => {
+  //TODO - location list search function
+};
+
+//Functions for UI components
+//**************************************************************************/
+//
 const populateDepartmentSelector = (shorten = true) => {
   departmentDirectoryQuery.readData('all').then((response) => {
     response.forEach((department) => {
       const departmentName = () => {
         if (shorten) {
-          return shortenDepartmentString(department.name, 14);
+          return shortenString(department.name, 14);
         } else return department.name;
       };
       $('#department-search-select, #department-edit-select').append(
@@ -988,68 +1167,56 @@ const populateDepartmentSelector = (shorten = true) => {
   });
 };
 
-const populateLocationSelector = () => {
+const populateLocationSelector = (shorten = true) => {
   locationDirectoryQuery.readData('all').then((response) => {
     response.forEach((location) => {
+      const locationName = () => {
+        if (shorten) {
+          return shortenString(location.name, 14);
+        } else return location.name;
+      };
       $('#location-search-select, #location-edit-select').append(
-        `<option value="${location.id}">${shortenDepartmentString(
-          location.name,
-          14
-        )}</option>`
+        `<option value="${location.id}">${locationName()}</option>`
       );
     });
   });
-};
-
-const updateDirectoryList = () => {
-  if ($('#person-file').length) {
-    $('#person-file').remove();
-    $('#main-content').html(
-      `<ul id="main-directory" class="directory-content"></ul>`
-    );
-    $('.directory-content').css('margin-top', marginTop[1]);
-  }
-  mainDirectory(
-    $('#name-search').val(),
-    $('#department-search-select option:selected').val()
-  );
 };
 
 const toggleSearchBar = async () => {
   if (!visibleSearch) {
     $('.directory-content').css('margin-top', marginTop[1]);
     $('#main-content-header').append(`
-            <div
-          id="search-bar"
-          style="margin-top: 3px; width: 100%; padding-right: 3px; display: flex"
-        >
-          <form class="form-inline" style="display: flex">
-            <input
-              style="flex: 1"
-              id="name-search"
-              class="form-control mr-sm-1"
-              type="search"
-              spellcheck="false"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <select
-              style="flex: 1; border-radius: 5px"
-              class="custom-select"
-              id="department-search-select"
-            >
-              <option value="0" selected>All Departments</option>
-            </select>
-          </form>
-        </div>`);
+    <div
+    id="search-bar"
+    style="margin-top: 3px; width: 100%; padding-right: 3px; display: flex"
+      >
+    <form class="form-inline" style="display: flex">
+      <input
+        style="flex: 1"
+        id="name-search"
+        class="form-control mr-sm-1"
+        type="search"
+        spellcheck="false"
+        placeholder="Search"
+        aria-label="Search"
+      />
+      <select
+        style="flex: 1; border-radius: 5px"
+        class="custom-select"
+        id="department-search-select"
+      >
+        <option value="0" selected>All Departments</option>
+      </select>
+    </form>
+  </div>`);
     populateDepartmentSelector();
-    updateDirectoryList();
+    updatePersonnelList();
 
     $('#name-search').on('keyup', function () {
-      updateDirectoryList();
+      updatePersonnelList();
     });
     $('#department-search-select').on('change', function () {
-      updateDirectoryList();
+      updatePersonnelList();
     });
     visibleSearch = true;
   } else {
@@ -1057,15 +1224,39 @@ const toggleSearchBar = async () => {
   }
 };
 
-const updatePersonRecord = async (id, email, department) => {
-  console.log(id, email, department);
+//Personnel Database Functions
+//**************************************************************************/
+//
+const createPersonnelRecord = async (firstName, lastName, email, department, placeholder) => {
+  try {
+    personnelDirectoryQuery
+      .createData(firstName, lastName, email, department, placeholder)
+      .then((response) => {
+        messageDisplay(
+          { responseText: `${firstName} ${lastName} added successfully.` },
+          'green',
+          showPersonFile,
+          response.last
+        );
+      });
+  } catch {
+    () =>
+      messageDisplay(
+        {
+          responseText: `Could not add ${firstName} ${lastName}.`
+        },
+        'red'
+      );
+  }
+};
 
+const updatePersonnelRecord = async (id, email, department) => {
   personnelDirectoryQuery
     .updateData(id, email, department)
     .then(() => {
       messageDisplay({ responseText: `Database Update Success` }, 'green');
     })
-    .catch((error) => {
+    .catch(() => {
       messageDisplay(
         {
           responseText: 'Could not update record.'
@@ -1075,64 +1266,57 @@ const updatePersonRecord = async (id, email, department) => {
     });
 };
 
-const loadPersonnelPage = () => {
-  changePageLayout('main');
-  toggleScroll(true);
-  if (!$('#personnel-button-container').length) {
-    $('#main-content-header').append(`
-      <div id="personnel-button-container" class="nav nav-tabs">
-      <button id="directory" class="personnel-button"><h3>Directory</h3></button>
-      <button id="departments" class="personnel-button"><h3>Teams</h3></button>
-      <button id="locations" class="personnel-button"><h3>Locations</h3></button>
-      <img id="search-icon" src='images/icons/search.png'alt='search database' width='20px' height='20px'/>
-      </div>`);
-  }
-  $('#search-icon').on('click', function () {
-    toggleSearchBar();
+const deletePersonnelRecord = async (id, name) => {
+  $('#main-content-header').append(`
+    <div id="delete-person-warning" class="alert alert-danger" role="alert">
+    You are about to offboard <b>${name}</b> and this action cannot be undone.
+    Please confirm that you want to remove <b>${name}</b> from the company
+    database.
+    <div class="btn-group" role="group" aria-label="edit or offboard">
+      <button id="confirm-delete-person" type="button" class="btn btn-primary">
+        Confirm
+      </button>
+      <button id="cancel-delete-person" type="button" class="btn btn-danger">
+        Cancel
+      </button>
+    </div>
+  </div>`);
+  $('#delete-person-warning').alert();
+  $('#confirm-delete-person').on('click', function (e) {
+    $('#delete-person-warning').remove();
+    e.stopPropagation();
+
+    personnelDirectoryQuery.deleteData('person', id).then((response) => {
+      console.log(response);
+      if (response.status.code == 200) {
+        messageDisplay(
+          {
+            responseText: `${name} has been successfully removed from the database.`
+          },
+          'green',
+          loadPersonnelPage
+        );
+      } else {
+        messageDisplay(
+          {
+            responseText: `${name} could not be deleted.`
+          },
+          'red'
+        );
+      }
+    });
   });
-
-  const loadPersonnelTab = (tab) => {
-    switch (tab) {
-      case 'directory':
-        $('#directory').focus();
-        $('#main-content').html(
-          `<ul id="main-directory" class="directory-content"></ul>`
-        );
-        mainDirectory('all');
-        break;
-
-      case 'departments':
-        $('#departments').focus();
-        $('#main-content').html(
-          `<ul id="department-list" class="directory-content"></ul>`
-        );
-        departmentList();
-        break;
-
-      case 'locations':
-        $('#locations').focus();
-        $('#main-content').html(
-          `<ul id="location-list" class="directory-content"></ul>`
-        );
-        locationList();
-        break;
-
-      default:
-        return;
-    }
-    toggleScroll(true);
-    scrollReset();
-  };
-
-  loadPersonnelTab('directory');
-
-  $('.personnel-button').on('click', function () {
-    loadPersonnelTab($(this).attr('id'));
-    $('.directory-content').css('margin-top', marginTop[0]);
+  $('#cancel-delete-person').on('click', function (e) {
+    $('#delete-person-warning').remove();
+    e.stopPropagation();
+    messageDisplay({ responseText: `${name} has not been deleted.` }, 'orange');
   });
 };
 
-const editPerson = async (id, location, department, email, locid) => {
+//Edit Personnel Record Page Main Code
+//**************************************************************************/
+//
+const editPersonnelRecord = async (id, location, department, email, locid, name) => {
   const locationSelection = `<select
     style="flex: 1; border-radius: 5px"
     class="custom-select"
@@ -1142,95 +1326,55 @@ const editPerson = async (id, location, department, email, locid) => {
     style="flex: 1; border-radius: 5px"
     class="custom-select"
     id="department-selector"
-    ><option id="current-department" value="0" selected>${shortenDepartmentString(
+    ><option id="current-department" value="0" selected>${shortenString(
       department,
       10
     )} (current)</option></select><br>`;
-  $('#location-info').replaceWith(
-    `<label>Location: </label> ${locationSelection}`
-  );
-  $('#department-info').replaceWith(
-    `<label>Department: </label> ${departmentSelection}`
-  );
+  $('#location-info').replaceWith(`<label>Location: </label> ${locationSelection}`);
+  $('#department-info').replaceWith(`<label>Department: </label> ${departmentSelection}`);
 
   createLocationDropdown(location);
-  updateProfileDepartmentList(locid, department);
+  updateProfiledisplayDepartmentList(locid, department);
   updateLocationAndDepartmentSelectors(locid, department);
 
   $('#edit-button-group').remove();
-  $('#person-file-info')
-    .append(`<li><form method="post" action="" enctype="multipart/form-data" id="replaceform">
-  <div class="custom-file">
-    <label id="profile-label" style="color: black" class="custom-file-label form-label" for="headshot-photo">Replace headshot photo (max 100kb)</label>
-    <input style="color: black" type="file" class="custom-file-input" id="file" name="file" />
-  </div>
-  <div id="edit-person-button-group" class="btn-group" role="group" aria-label="edit or offboard">
-  <button type="button" id="confirm-changes" class="btn btn-success confirm">Confirm</button>
-  <button type="button" class="btn btn-danger cancel">Cancel</button>
-  <button id="${id}" type="button" class="btn btn-secondary offboard">Offboard</button>
-</div>
-  </div>
-  </form></li>`);
-
+  $('#person-file-info').append(`
+    <li>
+    <form method="post" action="" enctype="multipart/form-data" id="replaceform">
+        <div class="custom-file">
+            <label id="profile-label" style="color: black" class="custom-file-label form-label"
+                for="headshot-photo">Replace headshot photo (max 100kb)</label>
+            <input style="color: black" type="file" class="custom-file-input" id="file" name="file" />
+        </div>
+        <div id="edit-person-button-group" class="btn-group" role="group" aria-label="edit or offboard">
+            <button type="button" id="confirm-changes" class="btn btn-success confirm">Confirm</button>
+            <button type="button" class="btn btn-danger cancel">Cancel</button>
+            <button id="${id}" type="button" class="btn btn-secondary offboard">Offboard</button>
+        </div>
+        </div>
+    </form>
+</li>`);
+  $('.offboard').on('click', function () {
+    deletePersonnelRecord(id, name);
+  });
   authenticateFileType();
   handleEmailInput(email);
   addNewPhoto(id);
 };
 
-const offboardPerson = async (id, name) => {
-  $('#main-content-header')
-    .append(`<div id="delete-person-warning" class="alert alert-danger" role="alert">
-  You are about to offboard <b>${name}</b> and this action cannot be undone.
-  Please confirm that you want to remove <b>${name}</b> from the company database.
-  <div class="btn-group" role="group" aria-label="edit or offboard">
-  <button id="confirm-delete-person"
-      type="button" class="btn btn-primary">Confirm</button>
-  <button id="cancel-delete-person" type="button" class="btn btn-danger">Cancel</button>
-</div>
-</div>`);
-  $('#delete-person-warning').alert();
-  $('#confirm-delete-person').on('click', function (e) {
-    $('#delete-person-warning').remove();
-    e.stopPropagation();
-
-    deleteRecord
-      .deleteData('person', id)
-      .then(() => {
-        messageDisplay(
-          {
-            responseText: `${name} has been successfully removed from the database.`
-          },
-          'green'
-        );
-      })
-      .catch((error) => {
-        messageDisplay(
-          {
-            responseText: 'Could not remove person.'
-          },
-          'red'
-        );
-      });
-  });
-  $('#cancel-delete-person').on('click', function (e) {
-    $('#delete-person-warning').remove();
-    e.stopPropagation();
-    messageDisplay({ responseText: `${name} has NOT been deleted.` }, 'green');
-  });
-};
-
+//Individual Personnel Record Page (displayed when directory photo clicked)
+//**************************************************************************/
+//
 const showPersonFile = async (id) => {
   if (!$('#main-content').length) {
     loadPersonnelPage();
   }
   toggleScroll(false);
   scrollReset();
-  personnelDirectoryQuery
-    .readData('id', id)
-    .then((response) => {
-      let person = response[0];
-      $('#main-content').html(
-        `<div class="card directory-content" id="person-file">
+  personnelDirectoryQuery.readData('id', id).then((response) => {
+    let person = response[0];
+    $('#main-content').html(
+      `<div class="card directory-content" id="person-file">
       <img
         class="card-img-top"
         src="images/staffpics/staffphoto_id${person.id}.jpg"
@@ -1246,60 +1390,63 @@ const showPersonFile = async (id) => {
         <div id="edit-button-group" class="btn-group" role="group" aria-label="edit or offboard">
         <button id="${person.id}" location="${person.location}" locid="${person.locid}" 
               dept="${person.department}" email="${person.email}"
-            type="button" class="btn btn-primary edit">Edit Details</button>
-        <button id="${person.id}" name="${person.firstName} ${person.lastName}" type="button" class="btn btn-secondary offboard">Offboard</button>
+            type="button" class="btn btn-primary edit" name="${person.firstName} ${person.lastName}">Edit Details</button>
+        <button id="${person.id}" name="${person.firstName} ${person.lastName}" 
+        type="button" class="btn btn-secondary offboard">Offboard</button>
       </div>
     </div>`
-      );
-      if (uploadPhoto) {
-        $('.card-img-top').attr('src', uploadPhoto);
-        $('body').on('click', function () {
-          location.reload();
-        });
-      }
-      uploadPhoto = null;
-      $('.edit').on('click', function () {
-        editPerson(
-          $(this).attr('id'),
-          $(this).attr('location'),
-          $(this).attr('dept'),
-          $(this).attr('email'),
-          $(this).attr('locid')
-        );
-        $('.confirm').on('click', function () {
-          console.log('updating record');
-          updatePersonRecord(
-            person.id,
-            $('#email-input').val(),
-            $('#department-selector :selected').val()
-          );
-          showPersonFile(person.id);
-        });
-        $('.cancel').on('click', function () {
-          showPersonFile(person.id);
-        });
-      });
-      $('.offboard').on('click', function () {
-        offboardPerson($(this).attr('id'), $(this).attr('name'));
-      });
-      $('#search-bar').empty();
-      $('.directory-content').css('margin-top', marginTop[0]);
-      scrollReset();
-    })
-    .catch((error) => {
-      messageDisplay(
-        {
-          responseText: 'Could not edit record.'
-        },
-        'red'
-      );
+    );
+    $('.offboard').on('click', function () {
+      deletePersonnelRecord($(this).attr('id'), $(this).attr('name'));
     });
+    if (uploadPhoto) {
+      $('.card-img-top').attr('src', uploadPhoto);
+      $('body').on('click', function () {
+        location.reload();
+      });
+    }
+    uploadPhoto = null;
+    $('.edit').on('click', function () {
+      editPersonnelRecord(
+        $(this).attr('id'),
+        $(this).attr('location'),
+        $(this).attr('dept'),
+        $(this).attr('email'),
+        $(this).attr('locid'),
+        $(this).attr('name')
+      );
+      $('.confirm').on('click', function () {
+        updatePersonnelRecord(
+          person.id,
+          $('#email-input').val(),
+          $('#department-selector :selected').val()
+        );
+        showPersonFile(person.id);
+      });
+      $('.cancel').on('click', function () {
+        showPersonFile(person.id);
+      });
+    });
+    $('#search-bar').empty();
+    $('.directory-content').css('margin-top', marginTop[0]);
+    scrollReset();
+  });
+  // .catch(() => {
+  //   messageDisplay(
+  //     {
+  //       responseText: 'Could not edit record.'
+  //     },
+  //     'red'
+  //   );
+  // });
 };
 
+//Main Icons - Load Requested Page
+//**************************************************************************/
+//
 const loadPage = (pageId) => {
   switch (pageId) {
     case 'dashboard':
-      toggleScroll(true);
       loadDashboard();
       break;
     case 'personnel':
@@ -1319,6 +1466,9 @@ const loadPage = (pageId) => {
   }
 };
 
+//Initialization
+//**************************************************************************/
+//
 $(document).ready(function () {
   $('.icon').on('click', function () {
     $('#page-title').text($(this).attr('value'));
@@ -1337,15 +1487,18 @@ $(document).ready(function () {
   loadDashboard();
 });
 
-function isInt(value) {
-  return (
-    !isNaN(value) &&
-    (function (x) {
-      return (x | 0) === x;
-    })(parseFloat(value))
-  );
-}
+// function isInt(value) {
+//   return (
+//     !isNaN(value) &&
+//     (function (x) {
+//       return (x | 0) === x;
+//     })(parseFloat(value))
+//   );
+// }
 
+//Simulated Notification Database
+//**************************************************************************/
+//
 let notificationArray = [
   {
     title: 'Welcome',
@@ -1358,7 +1511,7 @@ let notificationArray = [
     message:
       'Please welcome three new members of the sales team: Virge Bootes, Robena Ivanyutin and Brendan Fooks',
     image: 'images/icons/team.png',
-    action: `loadPersonnelPage(); departmentList();`
+    action: `loadPersonnelPage(); displayDepartmentList();`
   },
   {
     title: 'Photo Reminder',
@@ -1368,8 +1521,7 @@ let notificationArray = [
   },
   {
     title: 'New App Feature',
-    message:
-      'Try the new reports section for fascinating insights into our organization.',
+    message: 'Try the new reports section for fascinating insights into our organization.',
     image: 'images/icons/report.png',
     action: `toggleScroll(false);loadReportsPage();$('#page-title').text("Try our new Reports feature!");`
   },
