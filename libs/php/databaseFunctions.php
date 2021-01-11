@@ -1,7 +1,4 @@
 <?php
-// remove next two lines for production
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
@@ -25,7 +22,6 @@ if (mysqli_connect_errno()) {
 
 	exit;
 }
-
 
 switch ($_POST['querytype']) {
 
@@ -148,27 +144,6 @@ switch ($_POST['querytype']) {
 
 			case 'read':
 
-				// switch ($_POST['search']) {
-				// 	case 'all':
-				// 	case '':
-				// 		if ($_POST['param'] == 0) {
-				// 			$query = 'SELECT id, name, locationID 
-				// 			FROM department';
-				// 		} else {
-				// 			$query = 'SELECT * FROM personnel p
-				// 			WHERE p.departmentID = ' . $_POST['search'];
-				// 		}
-				// 		break;
-				// 	case 'id':
-				// 		break;
-				// 	default:
-				// 		if ($_POST['param'] == 0) {
-				// 		} else {
-				// 		}
-				// 		break;
-				// }
-
-
 				if ($_POST['search'] == 'all' || $_POST['search'] == '') {
 					$query = 'SELECT id, name, locationID 
 							FROM department';
@@ -181,21 +156,8 @@ switch ($_POST['querytype']) {
 									WHERE p.departmentID = ' . $_POST['search'] . '
 									AND (p.firstName LIKE "%' . $_POST['filter'] . '%"
 									OR p.lastName LIKE "%' . $_POST['filter'] . '%")';
-						// OR p.email LIKE "%' . $_POST['filter'] . '%")';
-						// ORDER BY p.lastName, p.firstName, d.name, l.name';
 					}
 				}
-
-
-
-
-
-
-				// } else {
-				// 		$query = 'SELECT * FROM department
-				// 			WHERE locationID = ' . $_POST['search'];
-				// 	}
-				// };
 				break;
 
 			case 'update':
@@ -230,16 +192,27 @@ switch ($_POST['querytype']) {
 				break;
 
 			case 'read':
-				if ($_POST['search'] === 'all') {
+
+				if ($_POST['search'] == 'all' || $_POST['search'] == '') {
 					$query = 'SELECT id, name
 								FROM location';
 				} else {
-					$query = 'SELECT p.id, p.lastName, p.firstName, d.name as department, d.id as deptID, l.name as location 
+					if ($_POST['param'] === 'person' && $_POST['filter'] == '') {
+						$query = 'SELECT p.id, p.lastName, p.firstName, d.name as department, d.id as deptID, l.name as location 
 								FROM personnel p
 								LEFT JOIN department d ON (d.id = p.departmentID) 
 								LEFT JOIN location l ON (l.id = d.locationID) 
 								WHERE l.id = ' . $_POST['search'];
-				};
+					} else {
+						$query = 'SELECT p.id, p.lastName, p.firstName, d.name as department, d.id as deptID, l.name as location 
+								FROM personnel p
+								LEFT JOIN department d ON (d.id = p.departmentID) 
+								LEFT JOIN location l ON (l.id = d.locationID) 
+								WHERE l.id = ' . $_POST['search'] . '
+								AND (p.firstName LIKE "%' . $_POST['filter'] . '%"
+								OR p.lastName LIKE "%' . $_POST['filter'] . '%")';
+					}
+				}
 				break;
 
 			case 'update':

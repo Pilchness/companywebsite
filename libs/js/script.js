@@ -32,7 +32,6 @@ class DatabaseQuery {
   };
 
   readData = async (search, param = 0, filter = '') => {
-    console.log('search: ' + search + ' param: ' + param + ' filter: ' + filter);
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -92,11 +91,9 @@ class DatabaseQuery {
         },
         success: function (result) {
           resolve(result);
-          console.log(result);
         },
         error: function (error) {
           reject(error);
-          console.log(error);
         }
       });
     });
@@ -793,9 +790,7 @@ const handleSettingsButton = async (table, action, ID) => {
               } else $('#confirm-new-location').removeAttr('disabled');
             });
             $('#confirm-new-location').on('click', function () {
-              console.log($('#location-new-name').val());
               locationDirectoryQuery.createData($('#location-new-name').val()).then((response) => {
-                console.log(response);
                 if (response.status.code == 200) {
                   $('#confirm-new-location').attr('disabled', true);
                   messageDisplay(
@@ -1081,7 +1076,7 @@ const loadPersonnelPage = () => {
         $('#directory').focus();
         $('#main-content').html(`<ul id="main-directory" class="directory-content"></ul>`);
         $('.directory-content').css('margin-top', marginTop[0]);
-        displayPersonnelList('all');
+        displayPersonnelList($('#name-search').val(), 0);
         $('#search-icon').removeAttr('disabled');
         break;
 
@@ -1089,7 +1084,7 @@ const loadPersonnelPage = () => {
         $('#departments').focus();
         $('#main-content').html(`<ul id="department-list" class="directory-content"></ul>`);
         //$('.directory-content').css('margin-top', marginTop[0]);
-        displayDepartmentList('', 0);
+        displayDepartmentList($('#name-search').val(), 0);
         //$('#search-icon').removeAttr('disabled');
         //visible = false;
         break;
@@ -1097,7 +1092,7 @@ const loadPersonnelPage = () => {
       case 'locations':
         $('#locations').focus();
         $('#main-content').html(`<ul id="location-list" class="directory-content"></ul>`);
-        displayLocationList('', 0);
+        displayLocationList($('#name-search').val(), 0);
         //visible = false;
         break;
 
@@ -1121,7 +1116,7 @@ const loadPersonnelPage = () => {
 //
 //<<<<<<<< PERSONNEL TAB >>>>>>>>
 //
-const displayPersonnelList = async (search, department) => {
+const displayPersonnelList = async (search = 'all', department) => {
   $('#main-directory').empty();
   personnelDirectoryQuery
     .readData(search, department)
@@ -1141,10 +1136,7 @@ const displayPersonnelList = async (search, department) => {
       </div>`);
       });
       if (visibleSearch) {
-        //toggleSearchBar();
         $('.directory-content').css('margin-top', marginTop[1]);
-        //toggleSearchBar();
-        console.log('searchbar present');
       }
       scrollReset();
     })
@@ -1160,7 +1152,6 @@ const displayPersonnelList = async (search, department) => {
 
 const updatePersonnelList = () => {
   if ($('#main-directory').length) {
-    console.log('main list');
     if ($('#person-file').length) {
       $('#person-file').remove();
       $('#main-content').html(`<ul id="main-directory" class="directory-content"></ul>`);
@@ -1176,46 +1167,50 @@ const updatePersonnelList = () => {
 //<<<<<<<< TEAMS (DEPARTMENTS) TAB >>>>>>>>
 //
 const displayDepartmentList = async (search, departmentFilter) => {
-  console.log(search, departmentFilter);
-  //if ($('#name-search').val() == '') removeSearchBar();
   $('#department-list').empty();
+
   departmentDirectoryQuery.readData('all').then((response) => {
     response.forEach((department) => {
-      //console.log(department, departmentFilter);
       if (department.id === departmentFilter || departmentFilter == 0) {
         $('#department-list')
-          .append(`<div class="card directory-card border-dark mb-1" style="max-width: 100%;">
+          .append(`<div id=directory-card${department.id} class="card directory-card border-dark mb-1" style="max-width: 100%;">
         <div class="card-header">${department.name}</div>
         <div class="dept-card-body text-dark">
           <ul id="personnel-dept-${department.id}" class="dept-section">
           </ul>
         </div>
       </div>`);
-        console.log(department.id, search);
         departmentDirectoryQuery
           .readData(department.id, 'person', search)
           .then((response) => {
-            console.log(response);
-            response.forEach((departmentMember) => {
-              $(`#personnel-dept-${department.id}`).append(
-                `<div class="dept-photo headshot" id="${departmentMember.id}">
+            if (response.length === 0 && visibleSearch) {
+              if (search === '' || departmentFilter === 0) {
+                $(`#personnel-dept-${department.id}`).append(
+                  'There are no staff currently working in this department.'
+                );
+                $(`#personnel-dept-${department.id}`).css('-webkit-columns', '1');
+              } else {
+                $(`#directory-card${department.id}`).remove();
+              }
+            } else {
+              response.forEach((departmentMember) => {
+                $(`#personnel-dept-${department.id}`).append(
+                  `<div class="dept-photo headshot" id="${departmentMember.id}">
             <img class="small-headshot" src='images/staffpics/staffphoto_id${departmentMember.id}.jpg' 
             width="30px" height="30px"/>
             <span class="person-card-text">${departmentMember.firstName} ${departmentMember.lastName}</span></div>`
-              );
-            });
-            if (visibleSearch) {
-              //toggleSearchBar();
-              $('.directory-content').css('margin-top', marginTop[1]);
-              //toggleSearchBar();
-              console.log('searchbar present');
+                );
+              });
+              if (visibleSearch) {
+                $('.directory-content').css('margin-top', marginTop[1]);
+              }
+              scrollReset();
             }
-            scrollReset();
           })
-          .catch((error) => {
+          .catch(() => {
             messageDisplay(
               {
-                responseText: 'Department List Error'
+                responseText: 'Department Listing Error'
               },
               'red'
             );
@@ -1226,11 +1221,8 @@ const displayDepartmentList = async (search, departmentFilter) => {
 };
 
 const updateDepartmentList = () => {
-  console.log('dept update');
   if ($('#department-list').length) {
-    console.log('department list');
     if ($('#person-file').length) {
-      console.log('here');
       $('#person-file').remove();
       $('#main-content').html(`<ul id="department-list" class="directory-content"></ul>`);
       $('.directory-content').css('margin-top', marginTop[0]);
@@ -1247,39 +1239,50 @@ const updateDepartmentList = () => {
 //
 const displayLocationList = async (search, departmentFilter) => {
   $('#location-list').empty();
-  //if ($('#name-search').val() == '') removeSearchBar();
   locationDirectoryQuery
     .readData('all')
     .then((response) => {
       response.forEach((location) => {
         $('#location-list')
-          .append(`<div class="card directory-card border-dark mb-1" style="max-width: 100%;">
+          .append(`<div id ="directory-card${location.id}" class="card directory-card border-dark mb-1" style="max-width: 100%;">
         <div class="card-header">${location.name}</div>
         <div class="dept-card-body text-dark">
-          <ul id="personnel-dept-${location.id}" class="location-section">
+          <ul id="personnel-loc-${location.id}" class="location-section">
           </ul>
         </div>
       </div>`);
         locationDirectoryQuery
-          .readData(location.id)
+          .readData(location.id, 'person', search)
           .then((response) => {
-            response.forEach((locationMember) => {
-              //console.log(locationMember, departmentFilter);
-              if (locationMember.deptID === departmentFilter || departmentFilter === 0) {
-                $(`#personnel-dept-${location.id}`).append(
-                  `<div class="location-photo headshot" id="${locationMember.id}">
+            if (response.length === 0 && visibleSearch) {
+              if (departmentFilter === 0) {
+                $(`#personnel-loc-${location.id}`).append(
+                  'There are no staff currently working at this location.'
+                );
+                $(`#personnel-loc-${location.id}`).css('-webkit-columns', '1');
+              } else {
+                $(`#directory-card${location.id}`).remove();
+              }
+            } else {
+              response.forEach((locationMember) => {
+                let emptyLocationDepartment = 0;
+                if (locationMember.deptID === departmentFilter || departmentFilter === 0) {
+                  emptyLocationDepartment++;
+                  $(`#personnel-loc-${location.id}`).append(
+                    `<div class="location-photo headshot" id="${locationMember.id}">
             <img class="small-headshot" src='images/staffpics/staffphoto_id${locationMember.id}.jpg' width="30px" height="30px"/>
             <span class="person-card-text">${locationMember.firstName} ${locationMember.lastName} (${locationMember.department})</span></div>`
-                );
+                  );
+                }
+                if (emptyLocationDepartment === 0) {
+                  $(`#directory-card${location.id}`).remove();
+                }
+              });
+              if (visibleSearch) {
+                $('.directory-content').css('margin-top', marginTop[1]);
               }
-            });
-            if (visibleSearch) {
-              //toggleSearchBar();
-              $('.directory-content').css('margin-top', marginTop[1]);
-              //toggleSearchBar();
-              console.log('searchbar present');
+              scrollReset();
             }
-            scrollReset();
           })
           .catch(() => {
             messageDisplay(
@@ -1302,11 +1305,8 @@ const displayLocationList = async (search, departmentFilter) => {
 };
 
 const updateLocationList = () => {
-  console.log('loc update');
   if ($('#location-list').length) {
-    console.log('location list');
     if ($('#person-file').length) {
-      console.log('here');
       $('#person-file').remove();
       $('#main-content').html(`<ul id="location-list" class="directory-content"></ul>`);
       $('.directory-content').css('margin-top', marginTop[0]);
@@ -1368,6 +1368,8 @@ const toggleSearchBar = async () => {
         spellcheck="false"
         placeholder="Search"
         aria-label="Search"
+        autocomplete="off" 
+        readonly onfocus="this.removeAttribute('readonly');"
       />
       <select
         style="flex: 1; border-radius: 5px"
@@ -1463,7 +1465,6 @@ const deletePersonnelRecord = async (id, name) => {
     e.stopPropagation();
 
     personnelDirectoryQuery.deleteData('person', id).then((response) => {
-      console.log(response);
       if (response.status.code == 200) {
         messageDisplay(
           {
