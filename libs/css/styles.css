@@ -219,6 +219,20 @@ label {
   border-radius: 5px;
 }
 
+input {
+  margin-bottom: 3px;
+  border-radius: 5px;
+  height: 32px !important;
+}
+
+.add {
+  font-size: 0.9em !important;
+}
+
+#dept-select-inner {
+  margin-bottom: 3px;
+}
+
 .card-body {
   /* height: auto;
   width: 100px; */
@@ -323,6 +337,7 @@ label {
 #department-edit-select,
 #location-edit-select {
   height: 32px;
+  margin-bottom: 3px;
 }
 
 .dept-photo,
@@ -378,7 +393,7 @@ form {
 
 .form-label {
   padding: 0;
-  margin: 0 0 0 3px;
+  margin: 0 0 2px 3px;
   font-size: 0.8em;
 }
 

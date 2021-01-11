@@ -147,18 +147,55 @@ switch ($_POST['querytype']) {
 				break;
 
 			case 'read':
-				if ($_POST['search'] === 'all') {
+
+				// switch ($_POST['search']) {
+				// 	case 'all':
+				// 	case '':
+				// 		if ($_POST['param'] == 0) {
+				// 			$query = 'SELECT id, name, locationID 
+				// 			FROM department';
+				// 		} else {
+				// 			$query = 'SELECT * FROM personnel p
+				// 			WHERE p.departmentID = ' . $_POST['search'];
+				// 		}
+				// 		break;
+				// 	case 'id':
+				// 		break;
+				// 	default:
+				// 		if ($_POST['param'] == 0) {
+				// 		} else {
+				// 		}
+				// 		break;
+				// }
+
+
+				if ($_POST['search'] == 'all' || $_POST['search'] == '') {
 					$query = 'SELECT id, name, locationID 
 							FROM department';
 				} else {
-					if ($_POST['param'] === 'person') {
+					if ($_POST['param'] === 'person' && $_POST['filter'] === '') {
 						$query = 'SELECT * FROM personnel p
 							WHERE p.departmentID = ' . $_POST['search'];
 					} else {
-						$query = 'SELECT * FROM department
-							WHERE locationID = ' . $_POST['search'];
+						$query = 'SELECT * FROM personnel p
+									WHERE p.departmentID = ' . $_POST['search'] . '
+									AND (p.firstName LIKE "%' . $_POST['filter'] . '%"
+									OR p.lastName LIKE "%' . $_POST['filter'] . '%")';
+						// OR p.email LIKE "%' . $_POST['filter'] . '%")';
+						// ORDER BY p.lastName, p.firstName, d.name, l.name';
 					}
-				};
+				}
+
+
+
+
+
+
+				// } else {
+				// 		$query = 'SELECT * FROM department
+				// 			WHERE locationID = ' . $_POST['search'];
+				// 	}
+				// };
 				break;
 
 			case 'update':
@@ -189,7 +226,7 @@ switch ($_POST['querytype']) {
 
 			case 'create':
 				$query = '
-					REPLACE INTO department (name, locationID) VALUES("' . $_POST['name'] . '",' . $_POST["ID"] . ')';
+					REPLACE INTO location (name) VALUES("' . $_POST['name'] . '")';
 				break;
 
 			case 'read':
@@ -197,7 +234,7 @@ switch ($_POST['querytype']) {
 					$query = 'SELECT id, name
 								FROM location';
 				} else {
-					$query = 'SELECT p.id, p.lastName, p.firstName, d.name as department, l.name as location 
+					$query = 'SELECT p.id, p.lastName, p.firstName, d.name as department, d.id as deptID, l.name as location 
 								FROM personnel p
 								LEFT JOIN department d ON (d.id = p.departmentID) 
 								LEFT JOIN location l ON (l.id = d.locationID) 
@@ -206,7 +243,7 @@ switch ($_POST['querytype']) {
 				break;
 
 			case 'update':
-				$query = 'UPDATE department SET name = "' . $_POST['data'] . '" WHERE id = ' . $_POST['id'];
+				$query = 'UPDATE location SET name = "' . $_POST['data'] . '" WHERE id = ' . $_POST['id'];
 				break;
 
 			case 'delete':
@@ -279,14 +316,14 @@ if ($_POST['operation'] == 'read') {
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 	$output['last'] = $lastID;
 
-	if ($_POST['operation'] == 'create') {
+	if ($_POST['operation'] == 'create' && $_POST['querytype'] == 'personnel') {
 		copy("../../images/icons/placeholder.jpg", "../../images/staffpics/staffphoto_id" . $lastID . ".jpg");
 		if (file_exists("../../images/uploads/staffphoto_temp.jpg")) {
 			rename("../../images/uploads/staffphoto_temp.jpg", "../../images/staffpics/staffphoto_id" . $lastID . ".jpg");
 		}
 	}
 
-	if ($_POST['operation'] == 'update') {
+	if ($_POST['operation'] == 'update' && $_POST['querytype'] == 'personnel') {
 		while (true) {
 			if (file_exists("../../images/uploads/staffphoto_temp.jpg")) {
 				rename("../../images/uploads/staffphoto_temp.jpg", "../../images/staffpics/staffphoto_id" . $_POST['id'] . ".jpg");

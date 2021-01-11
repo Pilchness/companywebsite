@@ -1,10 +1,7 @@
-<form method="post" action="" enctype="multipart/form-data" id="myform">
-    <div class="custom-file">
-      <img src="images/icons/placeholder.jpg" class="card-img-top" id="preview-image"/>
-      <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
-      <input type="file" class="custom-file-input" id="file" name="file" />
-    </div>
-    <button style="float: right; margin-right: -30px" id="new-onboard" value="Upload" class="btn btn-success button"
-      disabled>Add Employee</button>
-    </div>
-    </form>
+<div id="delete-location-warning" class="alert alert-danger" role="alert">
+  <p>Are you sure you want to delete the ${selectedLocation} location?</p>
+  <div class="btn-group" role="group" aria-label="edit or offboard">
+    <button id="confirm-delete-location" type="button" class="btn btn-primary">Confirm</button>
+    <button id="cancel-delete-location" type="button" class="btn btn-danger">Cancel</button>
+  </div>
+</div>
