@@ -1087,15 +1087,12 @@ const loadPersonnelPage = () => {
         $('#main-content').html(`<ul id="department-list" class="directory-content"></ul>`);
         //$('.directory-content').css('margin-top', marginTop[0]);
         displayDepartmentList($('#name-search').val(), 0);
-        //$('#search-icon').removeAttr('disabled');
-        //visible = false;
         break;
 
       case 'locations':
         $('#locations').focus();
         $('#main-content').html(`<ul id="location-list" class="directory-content"></ul>`);
         displayLocationList($('#name-search').val(), 0);
-        //visible = false;
         break;
 
       default:
@@ -1392,14 +1389,11 @@ const toggleSearchBar = async () => {
       updateDepartmentList();
       updateLocationList();
     };
-    //updatePersonnelList();
     $('#name-search').on('keyup', function () {
       updateDatabaseTabs();
-      //visibleSearch = true;
     });
     $('#department-search-select').on('change', function () {
       updateDatabaseTabs();
-      //visibleSearch = true;
     });
     visibleSearch = true;
   } else {
