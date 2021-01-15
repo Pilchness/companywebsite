@@ -196,9 +196,11 @@ const handleEmailInput = (email) => {
 //<<<<<<<< Onboard Input Logic and Validation>>>>>>>>
 //
 const updateProfiledisplayDepartmentList = async (location = 'all', department) => {
+  console.log(location, department);
   departmentDirectoryQuery
-    .readData(location, 'location')
+    .readData(location)
     .then((response) => {
+      console.log(response);
       response.forEach((dept) => {
         if (dept.name !== department) {
           $('#department-selector').append(
@@ -384,13 +386,13 @@ const loadSettings = () => {
   $('#personnel-button-container').remove();
   $('#page-content').append(
     `<div id="settings-container">
-    <h2>Rename, Add and Delete Departments</h2>
+    <h2 class="rename">Rename, Add and Delete Departments</h2>
     <select
     style="flex: 1; border-radius: 5px"
     class="custom-select"
     id="department-edit-select"
   >  <option value="0" selected>Choose a department...</option>
-  </select>
+  </select><br>
   <div id="edit-departments-button-group" class="btn-group" role="group" aria-label="edit departments">
   <button type="button" id="delete-department" class="btn btn-danger settings-button" disabled>Delete</button>
   <button type="button" id="edit-department" class="btn btn-warning settings-button" disabled>Edit</button>
@@ -399,13 +401,13 @@ const loadSettings = () => {
 </div>
   <br>
   <br>
-    <h2>Rename, Add and Delete Locations</h2>
+    <h2 class="rename">Rename, Add and Delete Locations</h2>
     <select
     style="flex: 1; border-radius: 5px"
     class="custom-select"
     id="location-edit-select"
   >  <option value="0" selected>Choose a location...</option>
-  </select>
+  </select><br>
   <div id="edit-locations-button-group" class="btn-group" role="group" aria-label="edit locations">
   <button type="button" id="delete-location" class="btn btn-danger settings-button" disabled>Delete</button>
   <button type="button" id="edit-location" class="btn btn-warning cancel settings-button" disabled>Edit</button>
@@ -1135,15 +1137,16 @@ const displayPersonnelList = async (search = 'all', department) => {
         </div>
       </div>`);
       });
+      $('body').scrollTop(0);
       if (visibleSearch) {
         $('.directory-content').css('margin-top', marginTop[1]);
       }
       scrollReset();
     })
-    .catch(() => {
+    .catch((error) => {
       messageDisplay(
         {
-          responseText: 'Staff Listing Error'
+          responseText: error
         },
         'red'
       );
@@ -1201,6 +1204,7 @@ const displayDepartmentList = async (search, departmentFilter) => {
             <span class="person-card-text">${departmentMember.firstName} ${departmentMember.lastName}</span></div>`
                 );
               });
+              $('body').scrollTop(0);
               if (visibleSearch) {
                 $('.directory-content').css('margin-top', marginTop[1]);
               }
@@ -1278,6 +1282,7 @@ const displayLocationList = async (search, departmentFilter) => {
                   $(`#directory-card${location.id}`).remove();
                 }
               });
+              $('body').scrollTop(0);
               if (visibleSearch) {
                 $('.directory-content').css('margin-top', marginTop[1]);
               }

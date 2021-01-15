@@ -144,20 +144,23 @@ switch ($_POST['querytype']) {
 
 			case 'read':
 
+
 				if ($_POST['search'] == 'all' || $_POST['search'] == '') {
 					$query = 'SELECT id, name, locationID 
 							FROM department';
-				} else {
-					if ($_POST['param'] === 'person' && $_POST['filter'] === '') {
-						$query = 'SELECT * FROM personnel p
+				} else if ($_POST['param'] === 'person' && $_POST['filter'] === '') {
+					$query = 'SELECT * FROM personnel p
 							WHERE p.departmentID = ' . $_POST['search'];
-					} else {
-						$query = 'SELECT * FROM personnel p
+				} else if ($_POST['param'] === 'person' && $_POST['filter'] !== '') {
+					$query = 'SELECT * FROM personnel p
 									WHERE p.departmentID = ' . $_POST['search'] . '
 									AND (p.firstName LIKE "%' . $_POST['filter'] . '%"
 									OR p.lastName LIKE "%' . $_POST['filter'] . '%")';
-					}
-				}
+				} else {
+					$query = 'SELECT id, name, locationID 
+							FROM department
+							WHERE locationID = ' . $_POST['search'];
+				};
 				break;
 
 			case 'update':
