@@ -6,7 +6,13 @@ class DatabaseQuery {
     this.querytype = querytype;
   }
 
-  createData = async (name, lastName = '', email = '', ID = '', placeholder = '') => {
+  createData = async (
+    name,
+    lastName = '',
+    email = '',
+    ID = '',
+    placeholder = ''
+  ) => {
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -153,7 +159,9 @@ const messageDisplay = (displayMessage, color = 'red', afterRemoval, param) => {
 //Change page layout to enable some pages to scroll and others to be static
 const changePageLayout = (changeTo) => {
   $('#main-content').length ? (changeFrom = 'main') : (changeFrom = 'page');
-  $(`#${changeFrom}-content`).replaceWith(`<div id="${changeTo}-content"></div>`);
+  $(`#${changeFrom}-content`).replaceWith(
+    `<div id="${changeTo}-content"></div>`
+  );
   scrollReset();
   removeSearchBar();
 };
@@ -173,7 +181,9 @@ const shortenString = (string, max) => {
 const emailValidate = new RegExp(
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 );
-const nameValidate = new RegExp(`^[a-zA-Z'\-\pL]+(?:(?! {2})[a-zA-Z'\-\pL ])*[a-zA-Z'\-\pL]+$`);
+const nameValidate = new RegExp(
+  `^[a-zA-Z'\-\pL]+(?:(?! {2})[a-zA-Z'\-\pL ])*[a-zA-Z'\-\pL]+$`
+);
 
 const handleEmailInput = (email) => {
   $('#email-info').replaceWith(
@@ -195,7 +205,10 @@ const handleEmailInput = (email) => {
 //
 //<<<<<<<< Onboard Input Logic and Validation>>>>>>>>
 //
-const updateProfiledisplayDepartmentList = async (location = 'all', department) => {
+const updateProfiledisplayDepartmentList = async (
+  location = 'all',
+  department
+) => {
   console.log(location, department);
   departmentDirectoryQuery
     .readData(location)
@@ -204,7 +217,10 @@ const updateProfiledisplayDepartmentList = async (location = 'all', department) 
       response.forEach((dept) => {
         if (dept.name !== department) {
           $('#department-selector').append(
-            `<option value="${dept.id}">${shortenString(dept.name, 20)}</option>`
+            `<option value="${dept.id}">${shortenString(
+              dept.name,
+              20
+            )}</option>`
           );
         }
       });
@@ -225,7 +241,9 @@ const createLocationDropdown = async (location) => {
     .then((response) => {
       response.forEach((loc) => {
         if (loc.name !== location) {
-          $('#location-selector').append(`<option value="${loc.id}">${loc.name}</option>`);
+          $('#location-selector').append(
+            `<option value="${loc.id}">${loc.name}</option>`
+          );
         }
       });
     })
@@ -467,10 +485,18 @@ const loadSettings = () => {
         );
         break;
       case 'edit-location':
-        handleSettingsButton('location', 'edit', $('#location-edit-select option:selected').val());
+        handleSettingsButton(
+          'location',
+          'edit',
+          $('#location-edit-select option:selected').val()
+        );
         break;
       case 'add-location':
-        handleSettingsButton('location', 'add', $('#location-edit-select option:selected').val());
+        handleSettingsButton(
+          'location',
+          'add',
+          $('#location-edit-select option:selected').val()
+        );
         break;
 
       default:
@@ -524,7 +550,9 @@ const handleSettingsButton = async (table, action, ID) => {
   } else {
     if (table === 'department') {
       if (ID !== 0) {
-        let selectedDepartment = $('#department-edit-select option:selected').text();
+        let selectedDepartment = $(
+          '#department-edit-select option:selected'
+        ).text();
         switch (action) {
           case 'delete':
             checkDepartmentDelete(selectedDepartment).then((response) => {
@@ -543,26 +571,28 @@ const handleSettingsButton = async (table, action, ID) => {
                   e.stopPropagation();
                 });
                 $('#confirm-delete-department').on('click', function () {
-                  departmentDirectoryQuery.deleteData(table, ID).then((response) => {
-                    if (response.status.code == 200) {
-                      messageDisplay(
-                        {
-                          responseText: `${selectedDepartment} deleted successfully`
-                        },
-                        'green',
-                        loadSettings
-                      );
-                    } else {
-                      () => {
+                  departmentDirectoryQuery
+                    .deleteData(table, ID)
+                    .then((response) => {
+                      if (response.status.code == 200) {
                         messageDisplay(
                           {
-                            responseText: `Could not delete department.`
+                            responseText: `${selectedDepartment} deleted successfully`
                           },
-                          'red'
+                          'green',
+                          loadSettings
                         );
-                      };
-                    }
-                  });
+                      } else {
+                        () => {
+                          messageDisplay(
+                            {
+                              responseText: `Could not delete department.`
+                            },
+                            'red'
+                          );
+                        };
+                      }
+                    });
                 });
               } else {
                 $('#main-content-header')
@@ -623,7 +653,7 @@ const handleSettingsButton = async (table, action, ID) => {
 
           case 'add':
             $('#department-edit-select').replaceWith(`
-            <div style="display: flex; flex-direction: row; align-items: flex-end"><input id="department-new-name" style="width: 10em; height: 40px" placeholder="New Department" spellcheck="false"></input>
+            <div class="edit-holder" style="display: flex; flex-direction: row; align-items: flex-end"><input id="department-new-name" style="width: 10em; height: 40px" placeholder="New Department" spellcheck="false"></input>
             <div id="dept-select-inner" style="display: flex; flex-direction: column"><label style="height: 10px; font-size: 10px" class="form-label" for="location-selector">New Dept Location</label>
             <select style="flex: 1; border-radius: 5px; height: 30px" class="custom-select add" id="location-selector"></select></div></div>
             `);
@@ -639,7 +669,12 @@ const handleSettingsButton = async (table, action, ID) => {
             });
             $('#confirm-new-department').on('click', function () {
               departmentDirectoryQuery
-                .createData($('#department-new-name').val(), '', '', $('#location-selector').val())
+                .createData(
+                  $('#department-new-name').val(),
+                  '',
+                  '',
+                  $('#location-selector').val()
+                )
                 .then((response) => {
                   if (response.status.code == 200) {
                     $('#confirm-new-department').attr('disabled', true);
@@ -678,7 +713,9 @@ const handleSettingsButton = async (table, action, ID) => {
       }
     } else if (table === 'location') {
       if (ID !== 0) {
-        let selectedLocation = $('#location-edit-select option:selected').text();
+        let selectedLocation = $(
+          '#location-edit-select option:selected'
+        ).text();
         switch (action) {
           case 'delete':
             checkLocationDelete(selectedLocation).then((response) => {
@@ -698,26 +735,28 @@ const handleSettingsButton = async (table, action, ID) => {
                   e.stopPropagation();
                 });
                 $('#confirm-delete-location').on('click', function () {
-                  locationDirectoryQuery.deleteData(table, ID).then((response) => {
-                    if (response.status.code == 200) {
-                      messageDisplay(
-                        {
-                          responseText: `${selectedLocation} deleted successfully`
-                        },
-                        'green',
-                        loadSettings
-                      );
-                    } else {
-                      () => {
+                  locationDirectoryQuery
+                    .deleteData(table, ID)
+                    .then((response) => {
+                      if (response.status.code == 200) {
                         messageDisplay(
                           {
-                            responseText: `Could not delete location.`
+                            responseText: `${selectedLocation} deleted successfully`
                           },
-                          'red'
+                          'green',
+                          loadSettings
                         );
-                      };
-                    }
-                  });
+                      } else {
+                        () => {
+                          messageDisplay(
+                            {
+                              responseText: `Could not delete location.`
+                            },
+                            'red'
+                          );
+                        };
+                      }
+                    });
                 });
               } else {
                 $('#main-content-header')
@@ -778,7 +817,7 @@ const handleSettingsButton = async (table, action, ID) => {
 
           case 'add':
             $('#location-edit-select').replaceWith(`
-              <div style="display: flex; flex-direction: row; align-items: flex-end"><input id="location-new-name" 
+              <div class="edit-holder" style="display: flex; flex-direction: row; align-items: flex-end"><input id="location-new-name" 
               style="width: 10em; height: 40px" placeholder="New location" spellcheck="false"></input>
               `);
             createLocationDropdown();
@@ -792,28 +831,32 @@ const handleSettingsButton = async (table, action, ID) => {
               } else $('#confirm-new-location').removeAttr('disabled');
             });
             $('#confirm-new-location').on('click', function () {
-              locationDirectoryQuery.createData($('#location-new-name').val()).then((response) => {
-                if (response.status.code == 200) {
-                  $('#confirm-new-location').attr('disabled', true);
-                  messageDisplay(
-                    {
-                      responseText: `${$('#location-new-name').val()} created successfully`
-                    },
-                    'green',
-                    loadSettings
-                  );
-                } else {
-                  messageDisplay(
-                    {
-                      responseText: `${$(
-                        '#location-new-name'
-                      ).val()} could not be created. Please try again.`
-                    },
-                    'red',
-                    loadSettings
-                  );
-                }
-              });
+              locationDirectoryQuery
+                .createData($('#location-new-name').val())
+                .then((response) => {
+                  if (response.status.code == 200) {
+                    $('#confirm-new-location').attr('disabled', true);
+                    messageDisplay(
+                      {
+                        responseText: `${$(
+                          '#location-new-name'
+                        ).val()} created successfully`
+                      },
+                      'green',
+                      loadSettings
+                    );
+                  } else {
+                    messageDisplay(
+                      {
+                        responseText: `${$(
+                          '#location-new-name'
+                        ).val()} could not be created. Please try again.`
+                      },
+                      'red',
+                      loadSettings
+                    );
+                  }
+                });
             });
             break;
 
@@ -903,11 +946,17 @@ const loadReportsPage = async () => {
               $('#page-content').append(
                 `<div id="report-container">
           <p class="body-text">
-            There are currently <strong>${staffdata.length}</strong> employees at Global Unity, 
+            There are currently <strong>${
+              staffdata.length
+            }</strong> employees at Global Unity, 
             working in <strong>${departmentdata.length}</strong> departments
-            over <strong>${locationdata.length}</strong> locations across the world.
+            over <strong>${
+              locationdata.length
+            }</strong> locations across the world.
           </p>
-          <p class="body-text">The largest department is <strong>${largestdepartment[0]}</strong> 
+          <p class="body-text">The largest department is <strong>${
+            largestdepartment[0]
+          }</strong> 
           with <strong>${largestdepartment[1]}</strong> employees.</p>
           <p class="body-text">Out of the ${
             staffdata.length
@@ -975,7 +1024,7 @@ const addNewPhoto = (id) => {
 //
 
 const photoUploadForm = `<form method="post" action="" enctype="multipart/form-data" id="myform">
-<div class="custom-file">
+<div id="edit-photo" class="custom-file">
   <img src="images/icons/placeholder.jpg" class="card-img-top" id="preview-image"/>
   <label class="custom-file-label form-label" for="headshot-photo">Upload headshot photo (max 100kb)</label>
   <input type="file" class="custom-file-input" id="file" name="file" />
@@ -1076,7 +1125,9 @@ const loadPersonnelPage = () => {
     switch (tab) {
       case 'directory':
         $('#directory').focus();
-        $('#main-content').html(`<ul id="main-directory" class="directory-content"></ul>`);
+        $('#main-content').html(
+          `<ul id="main-directory" class="directory-content"></ul>`
+        );
         $('.directory-content').css('margin-top', marginTop[0]);
         displayPersonnelList($('#name-search').val(), 0);
         $('#search-icon').removeAttr('disabled');
@@ -1084,14 +1135,18 @@ const loadPersonnelPage = () => {
 
       case 'departments':
         $('#departments').focus();
-        $('#main-content').html(`<ul id="department-list" class="directory-content"></ul>`);
+        $('#main-content').html(
+          `<ul id="department-list" class="directory-content"></ul>`
+        );
         //$('.directory-content').css('margin-top', marginTop[0]);
         displayDepartmentList($('#name-search').val(), 0);
         break;
 
       case 'locations':
         $('#locations').focus();
-        $('#main-content').html(`<ul id="location-list" class="directory-content"></ul>`);
+        $('#main-content').html(
+          `<ul id="location-list" class="directory-content"></ul>`
+        );
         displayLocationList($('#name-search').val(), 0);
         break;
 
@@ -1154,7 +1209,9 @@ const updatePersonnelList = () => {
   if ($('#main-directory').length) {
     if ($('#person-file').length) {
       $('#person-file').remove();
-      $('#main-content').html(`<ul id="main-directory" class="directory-content"></ul>`);
+      $('#main-content').html(
+        `<ul id="main-directory" class="directory-content"></ul>`
+      );
       $('.directory-content').css('margin-top', marginTop[0]);
     }
     displayPersonnelList(
@@ -1188,7 +1245,10 @@ const displayDepartmentList = async (search, departmentFilter) => {
                 $(`#personnel-dept-${department.id}`).append(
                   'There are no staff currently working in this department.'
                 );
-                $(`#personnel-dept-${department.id}`).css('-webkit-columns', '1');
+                $(`#personnel-dept-${department.id}`).css(
+                  '-webkit-columns',
+                  '1'
+                );
               } else {
                 $(`#directory-card${department.id}`).remove();
               }
@@ -1225,7 +1285,9 @@ const updateDepartmentList = () => {
   if ($('#department-list').length) {
     if ($('#person-file').length) {
       $('#person-file').remove();
-      $('#main-content').html(`<ul id="department-list" class="directory-content"></ul>`);
+      $('#main-content').html(
+        `<ul id="department-list" class="directory-content"></ul>`
+      );
       $('.directory-content').css('margin-top', marginTop[0]);
     }
     displayDepartmentList(
@@ -1267,7 +1329,10 @@ const displayLocationList = async (search, departmentFilter) => {
             } else {
               response.forEach((locationMember) => {
                 let emptyLocationDepartment = 0;
-                if (locationMember.deptID === departmentFilter || departmentFilter === 0) {
+                if (
+                  locationMember.deptID === departmentFilter ||
+                  departmentFilter === 0
+                ) {
                   emptyLocationDepartment++;
                   $(`#personnel-loc-${location.id}`).append(
                     `<div class="location-photo headshot" id="${locationMember.id}">
@@ -1310,7 +1375,9 @@ const updateLocationList = () => {
   if ($('#location-list').length) {
     if ($('#person-file').length) {
       $('#person-file').remove();
-      $('#main-content').html(`<ul id="location-list" class="directory-content"></ul>`);
+      $('#main-content').html(
+        `<ul id="location-list" class="directory-content"></ul>`
+      );
       $('.directory-content').css('margin-top', marginTop[0]);
     }
     displayLocationList(
@@ -1404,7 +1471,13 @@ const toggleSearchBar = async () => {
 //Personnel Database Functions
 //**************************************************************************/
 //
-const createPersonnelRecord = async (firstName, lastName, email, department, placeholder) => {
+const createPersonnelRecord = async (
+  firstName,
+  lastName,
+  email,
+  department,
+  placeholder
+) => {
   try {
     personnelDirectoryQuery
       .createData(firstName, lastName, email, department, placeholder)
@@ -1492,7 +1565,14 @@ const deletePersonnelRecord = async (id, name) => {
 //Edit Personnel Record Page Main Code
 //**************************************************************************/
 //
-const editPersonnelRecord = async (id, location, department, email, locid, name) => {
+const editPersonnelRecord = async (
+  id,
+  location,
+  department,
+  email,
+  locid,
+  name
+) => {
   const locationSelection = `<select
     style="flex: 1; border-radius: 5px"
     class="custom-select"
@@ -1506,8 +1586,12 @@ const editPersonnelRecord = async (id, location, department, email, locid, name)
       department,
       10
     )} (current)</option></select><br>`;
-  $('#location-info').replaceWith(`<label>Location: </label> ${locationSelection}`);
-  $('#department-info').replaceWith(`<label>Department: </label> ${departmentSelection}`);
+  $('#location-info').replaceWith(
+    `<label>Location: </label> ${locationSelection}`
+  );
+  $('#department-info').replaceWith(
+    `<label>Department: </label> ${departmentSelection}`
+  );
 
   createLocationDropdown(location);
   updateProfiledisplayDepartmentList(locid, department);
@@ -1517,7 +1601,7 @@ const editPersonnelRecord = async (id, location, department, email, locid, name)
   $('#person-file-info').append(`
     <li>
     <form method="post" action="" enctype="multipart/form-data" id="replaceform">
-        <div class="custom-file">
+        <div class="custom-file" id="edit-person">
             <label id="profile-label" style="color: black" class="custom-file-label form-label"
                 for="headshot-photo">Replace headshot photo (max 100kb)</label>
             <input style="color: black" type="file" class="custom-file-input" id="file" name="file" />
@@ -1680,7 +1764,8 @@ let notificationArray = [
   },
   {
     title: 'New App Feature',
-    message: 'Try the new reports section for fascinating insights into our organization.',
+    message:
+      'Try the new reports section for fascinating insights into our organization.',
     image: 'images/icons/report.png',
     action: `toggleScroll(false);loadReportsPage();$('#page-title').text("Try our new Reports feature!");`
   },

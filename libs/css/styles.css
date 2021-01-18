@@ -989,29 +989,28 @@ form {
     min-height: revert;
     max-width: revert;
     max-height: revert;
-    width: 150px;
-    height: 150px;
-    margin: 40px;
+    width: 70px;
+    height: 70px;
+    margin: 10px;
     position: static;
   }
 
   #main-body {
-    grid-template-columns: minmax(350px, 10%) 1fr;
+    grid-template-columns: minmax(80px, 10%) 1fr;
     position: static;
-    /* margin-left: 300px; */
     padding-left: 0;
   }
 
   .left-sidebar {
-    width: 350px;
+    width: 80px;
     position: static;
     z-index: revert;
   }
 
   #sidebar-holder {
-    width: 300px;
+    width: 75px;
     position: fixed;
-    left: 18vw;
+    left: 16vw;
     top: 30vh;
     margin: 50px;
     padding: 0;
@@ -1019,19 +1018,19 @@ form {
   }
 
   #settings-icon {
-    width: revert;
-    height: revert;
+    width: 70px;
+    height: 70px;
     margin: revert;
     position: fixed;
-    right: 20vw;
-    margin-top: 50px;
+    right: 22vw;
+    margin-top: 26px;
   }
 
   #personnel-button-container {
-    margin-left: 33px;
+    margin-left: 0px;
     position: fixed;
-    width: 49vw;
-    top: 25.5vh;
+    width: 40vw;
+    top: 26.5vh;
     left: 28.2vw;
   }
 
@@ -1040,7 +1039,7 @@ form {
     min-height: revert;
     margin-right: revert;
     max-width: revert;
-    height: 500px;
+    height: 125px;
   }
 
   #main-content-header {
@@ -1069,8 +1068,8 @@ form {
   header {
     min-height: revert;
     max-height: revert;
-    height: 30vh;
-    width: 70vw;
+    height: 31vh;
+    width: 72vw;
     position: fixed;
     left: revert;
     top: revert;
@@ -1086,9 +1085,9 @@ form {
   }
 
   .message-image {
-    width: 200px;
-    height: 200px;
-    margin: 30px;
+    width: 70px;
+    height: 70px;
+    margin: 2px;
     float: right;
   }
 
@@ -1098,27 +1097,27 @@ form {
   }
 
   p.message-text {
-    font-size: 3em;
-    padding: 27px;
+    font-size: 1em;
+    padding: 7px;
     line-height: 1.5;
-    width: 46vw;
+    width: 48vw;
   }
 
   .card-header {
-    padding: 0 0 0 56px;
-    font-size: 55px;
+    padding: 0 0 0 18px;
+    font-size: 1.5em;
   }
 
   .message-close {
-    width: 10px;
-    height: 10px;
-    margin: 10px;
+    width: 4px;
+    height: 4px;
+    margin: 4px;
     float: right;
   }
 
   #page-title {
-    font-size: 6em;
-    margin-bottom: 50px;
+    font-size: 2em;
+    margin-bottom: 13px;
     color: white;
     text-align: center;
     z-index: 99999;
@@ -1129,7 +1128,7 @@ form {
   #department-list,
   #location-list {
     margin-left: revert;
-    margin-top: 30vh !important;
+    margin-top: 31vh !important;
     width: 50vw;
   }
 
@@ -1143,51 +1142,53 @@ form {
   #report-container,
   #form-container {
     padding-bottom: revert;
-    margin-top: 30vh !important;
-    width: 51vw;
-    margin-left: 30px;
+    margin-top: 31.5vh !important;
+    width: 49vw;
+    margin-left: 0px;
   }
 
   #person-file {
     position: relative;
     left: 0vw;
+    display: flex;
+    flex-direction: row;
   }
 
   .directory-content > .card-img-top {
     width: revert;
     height: revert;
-    width: 900px;
-    height: 900px;
+    width: 225px;
+    height: 225px;
   }
 
   h2.card-title {
-    font-size: 40px;
-    padding: 40px;
+    font-size: 2em;
+    padding: 2px;
   }
 
   #person-file-info {
-    font-size: 15px;
+    font-size: 1em;
   }
 
   #delete-person-warning {
-    margin-left: 40px;
-    margin-top: 10px;
+    margin-left: 10px;
+    margin-top: 3px;
   }
 
   .person-card-text {
-    font-size: 40px;
+    font-size: 1em;
     list-style-type: none;
   }
 
   .headshot {
-    width: 300px;
-    height: 300px;
-    padding: 10px;
+    width: 100px;
+    height: 100px;
+    padding: 3px;
   }
 
   .small-headshot {
-    width: 60px;
-    height: 60px;
+    width: 30px;
+    height: 30px;
   }
 
   .dept-photo,
@@ -1203,9 +1204,10 @@ form {
   }
 
   p.body-text {
-    font-size: 3em;
+    font-size: 1em;
     color: white;
-    width: 30vw;
+    width: 38vw;
+    margin-left: 0;
   }
 
   #onboard-paragraph {
@@ -1219,9 +1221,9 @@ form {
 
   .form-control,
   .custom-select {
-    height: 122px;
-    font-size: 1.5em;
-    width: 25vw;
+    height: 40px;
+    font-size: 1em;
+    width: 18vw;
   }
 
   #preview-image {
@@ -1239,7 +1241,7 @@ form {
 
   #new-onboard {
     margin-right: revert;
-    font-size: 14px;
+    font-size: 1em;
     position: relative;
     left: -20vw;
   }
@@ -1250,15 +1252,14 @@ form {
 
   .btn-group,
   .btn {
-    font-size: 50px !important;
+    font-size: 1em !important;
     height: 2.2em !important;
-    margin-left: 10px;
   }
 
   .form-label {
     margin: 0;
     padding: 0;
-    font-size: 28px;
+    font-size: 1em;
   }
 
   .form-control {
@@ -1266,21 +1267,22 @@ form {
   }
 
   #file {
-    font-size: 40px;
+    font-size: 1em;
   }
 
   h3 {
-    font-size: 64px;
+    font-size: 1em;
   }
 
   input {
-    height: 110px;
-    font-size: 62px;
+    height: 2em;
+    font-size: 1.2em;
+    margin-bottom: 3px;
   }
 
   #search-icon {
-    height: 100px;
-    width: 100px;
+    height: 2em;
+    width: 2em;
   }
 
   #search-bar {
@@ -1291,16 +1293,16 @@ form {
   #department-search,
   #department-search-select,
   #location-search-select {
-    width: 650px;
-    height: 128px;
-    font-size: 50px;
-    padding-left: 20px;
+    width: 180px;
+    height: 31px;
+    font-size: 2em;
+    padding-left: 5px;
     margin-left: revert;
   }
 
   #location-selector,
   #department-selector {
-    font-size: 53px !important;
+    font-size: 1.3em !important;
   }
 
   #main-content {
@@ -1309,7 +1311,7 @@ form {
   }
 
   li {
-    font-size: 46px;
+    font-size: 1em;
     padding: 3px;
     list-style-type: none;
   }
@@ -1319,14 +1321,14 @@ form {
   }
 
   h2.card-title {
-    font-size: 50px;
+    font-size: 1.5em;
     font-weight: 600;
   }
 
   #settings-container,
   #report-container,
   #form-container {
-    font-size: 3em;
+    font-size: 1em;
     flex-direction: column;
     color: white;
   }
@@ -1341,9 +1343,14 @@ form {
   }
 
   label {
-    font-size: 45px;
-    padding-bottom: 42px;
-    padding-left: 20px;
+    font-size: 1.5em;
+    padding-bottom: 10px;
+    padding-left: 5px;
+  }
+
+  #profile-label {
+    top: 21px;
+    left: -88px;
   }
 
   .rename {
@@ -1352,19 +1359,19 @@ form {
   }
 
   .custom-file-input {
-    margin-left: -419px;
+    margin-left: -21vw;
     margin-top: 26px;
   }
 
   .custom-file-label {
-    font-size: 28px;
+    font-size: 0.7em;
     position: relative;
     top: -58px;
     left: 50px;
   }
 
   .alert {
-    font-size: 50px;
+    font-size: 1.2em;
     width: 30vw;
   }
 
@@ -1373,7 +1380,42 @@ form {
   #location-search-select,
   #department-edit-select,
   #location-edit-select {
-    height: 130px;
+    height: 30px;
     margin-bottom: -30px;
+  }
+
+  .custom-file {
+    margin-left: 100px;
+    top: -24px;
+  }
+
+  #edit-person-button-group {
+    margin-left: 5px;
+  }
+
+  #report-list {
+    margin-left: 0;
+  }
+
+  #edit-photo > #preview-image {
+    position: relative;
+    left: -140px;
+    top: 0;
+  }
+
+  #edit-photo > #file {
+    position: relative;
+    left: 5vw;
+    top: 11px;
+  }
+
+  #edit-photo > .custom-file-label {
+    position: relative;
+    left: -100px;
+    top: 34px;
+  }
+
+  #form-container {
+    overflow-y: scroll;
   }
 }
