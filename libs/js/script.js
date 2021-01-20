@@ -209,11 +209,9 @@ const updateProfiledisplayDepartmentList = async (
   location = 'all',
   department
 ) => {
-  console.log(location, department);
   departmentDirectoryQuery
     .readData(location)
     .then((response) => {
-      console.log(response);
       response.forEach((dept) => {
         if (dept.name !== department) {
           $('#department-selector').append(
@@ -241,7 +239,7 @@ const createLocationDropdown = async (location) => {
     .then((response) => {
       response.forEach((loc) => {
         if (loc.name !== location) {
-          $('#location-selector').append(
+          $('#location-selector, #location-selector-change').append(
             `<option value="${loc.id}">${loc.name}</option>`
           );
         }
@@ -255,6 +253,12 @@ const createLocationDropdown = async (location) => {
         'red'
       );
     });
+};
+
+const updateLocationSelector = (location) => {
+  $('#location-selector-change').append(
+    `<option value="0">${location} (current)</option>`
+  );
 };
 
 const updateLocationAndDepartmentSelectors = (locid, department) => {
@@ -610,8 +614,37 @@ const handleSettingsButton = async (table, action, ID) => {
             break;
 
           case 'edit':
-            $('#department-edit-select').replaceWith(`
-          <input id="department-edit-name" style="width: 14em" value="${selectedDepartment}" spellcheck="false"></input>`);
+            $('#department-edit-select')
+              .replaceWith(`<div style="display: flex 0 1 auto; flex-direction: row">
+          <input id="department-edit-name" style="width: 10em" value="${selectedDepartment}" spellcheck="false"></input>
+          <select
+          style="flex: 1; border-radius: 5px; height: 30px"
+          class="custom-select add"
+          id="location-selector-change"
+        ></select></div>`);
+
+            const getLocationFromDepartment = (selectedDepartment) => {
+              let selectedLocation = '';
+              return new Promise((resolve, reject) =>
+                departmentDirectoryQuery.readData('all').then((response) => {
+                  response.forEach((department) => {
+                    if (department.name === selectedDepartment) {
+                      selectedLocation = department.location;
+                    }
+                  });
+                  if (selectedLocation === '') {
+                    reject();
+                  } else resolve(selectedLocation);
+                })
+              );
+            };
+            let currentSelectedLocation;
+            getLocationFromDepartment(selectedDepartment).then((response) => {
+              currentSelectedLocation = response;
+              updateLocationSelector(response);
+              createLocationDropdown(response);
+            });
+
             $('#delete-department').attr('disabled', true);
             $('#add-department').attr('disabled', true);
             $('#edit-department').replaceWith(` 
@@ -623,15 +656,55 @@ const handleSettingsButton = async (table, action, ID) => {
             });
             $('#confirm-edit-department').on('click', function () {
               departmentDirectoryQuery
-                .updateData(ID, $('#department-edit-name').val())
+                .updateData(
+                  ID,
+                  $('#department-edit-name').val(),
+                  $('#location-selector-change').val()
+                )
                 .then((response) => {
                   if (response.status.code == 200) {
                     $('#confirm-edit-department').attr('disabled', true);
+                    let messageResponse = '';
+                    let currentSelectedLocationName = $(
+                      '#location-selector-change :selected'
+                    ).text();
+                    const locationChange = [
+                      currentSelectedLocationName.replace(' (current)', ''),
+                      currentSelectedLocation
+                    ];
+                    const nameChange = [
+                      $('#department-edit-name').val(),
+                      selectedDepartment
+                    ];
+                    let locationChangedCheck = !(
+                      locationChange[0] === locationChange[1]
+                    );
+                    let departmentNameChangeCheck = !(
+                      nameChange[0] === nameChange[1]
+                    );
+                    if (departmentNameChangeCheck && locationChangedCheck) {
+                      messageResponse = `${selectedDepartment} successfully changed to ${$(
+                        '#department-edit-name'
+                      ).val()} and ${selectedDepartment} department's location is now ${$(
+                        '#location-selector-change :selected'
+                      ).text()}`;
+                    }
+                    if (!departmentNameChangeCheck && !locationChangedCheck) {
+                      messageResponse = `You didn't change anything, the database is unchanged.`;
+                    }
+                    if (departmentNameChangeCheck && !locationChangedCheck) {
+                      messageResponse = `${selectedDepartment} successfully changed to ${$(
+                        '#department-edit-name'
+                      ).val()}`;
+                    }
+                    if (!departmentNameChangeCheck && locationChangedCheck) {
+                      messageResponse = `${selectedDepartment} department's location is now ${$(
+                        '#location-selector-change :selected'
+                      ).text()}`;
+                    }
                     messageDisplay(
                       {
-                        responseText: `${selectedDepartment} successfully changed to ${$(
-                          '#department-edit-name'
-                        ).val()}`
+                        responseText: messageResponse
                       },
                       'green',
                       loadSettings

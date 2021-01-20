@@ -146,8 +146,9 @@ switch ($_POST['querytype']) {
 
 
 				if ($_POST['search'] == 'all' || $_POST['search'] == '') {
-					$query = 'SELECT id, name, locationID 
-							FROM department';
+					$query = 'SELECT d.id, d.name, d.locationID, l.name as location  
+							FROM department d
+							LEFT JOIN location l ON (l.id = d.locationID)';
 				} else if ($_POST['param'] === 'person' && $_POST['filter'] === '') {
 					$query = 'SELECT * FROM personnel p
 							WHERE p.departmentID = ' . $_POST['search'];
@@ -164,7 +165,13 @@ switch ($_POST['querytype']) {
 				break;
 
 			case 'update':
-				$query = 'UPDATE department SET name = "' . $_POST['data'] . '" WHERE id = ' . $_POST['id'];
+
+				if ($_POST['department'] == 0) {
+					$query = 'UPDATE department SET name = "' . $_POST['data'] . '" WHERE id = ' . $_POST['id'];
+				} else {
+					$query = 'UPDATE department SET name = "' . $_POST['data'] . '", locationID = "' . $_POST['department'] .
+						'" WHERE id = ' . $_POST['id'];
+				}
 				break;
 
 			case 'delete':
